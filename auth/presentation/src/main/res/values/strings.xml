@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intro_title">Fresh ideas for every meal.</string>
+    <string name="intro_body">Learn, create, and save all the recipes in the world.</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="login">Login</string>
+    <string name="dont_have_an_account">Don\'t have an account?</string>
+    <string name="register">Register</string>
+    <string name="intro_additional">2k+ recipes for you to discover</string>
+    <string name="password_must">Password must</string>
+    <string name="incorrect_credentials">Incorrect credentials.</string>
+    <string name="login_succssful">Login successful</string>
+    <string name="must_be_valid_email">Enter a valid email</string>
+    <string name="contain_at_least_x_characters">Contain at least %d characters</string>
+    <string name="contain_number">Contain a number</string>
+    <string name="contain_lowercase_letter">Contain a lowercase letter</string>
+    <string name="contain_uppercase_letter">Contain an uppercase letter</string>
+    <string name="register_successful">Register successful</string>
+</resources>

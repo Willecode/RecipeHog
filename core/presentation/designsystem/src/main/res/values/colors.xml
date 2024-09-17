@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="intro_primary">#FFF98424</color>
+    <color name="intro_variant">#FFF94F24</color>
+    <color name="intro_on_background">#FFFFFFFF</color>
+    <color name="intro_logo">#FFFFFFFF</color>
+    <color name="intro_textfield_focus">#FFF98424</color>
+    <color name="intro_textfield_unfocus">#FFC9C7CC</color>
+
+    <color name="password_validator_red">#CE0C0C</color>
+    <color name="password_validator_green">#4CAF50</color>
+</resources>
