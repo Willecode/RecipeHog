@@ -14,7 +14,9 @@ import org.koin.dsl.module
 
 val authDataModule = module {
     single {
-        FirebaseAuth.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        auth.useEmulator("10.0.2.2", 9099)
+        auth
     }
     singleOf(::FirebaseAuthRepository).bind<AuthRepository>()
     singleOf(::AndroidEmailValidator).bind<EmailValidator>()

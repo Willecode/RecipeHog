@@ -33,3 +33,6 @@ gradle-wrapper.jar
 .idea/
 /*.iml
 /out/
+
+# Other
+*.exe
