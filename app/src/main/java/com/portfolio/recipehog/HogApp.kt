@@ -3,6 +3,8 @@ package com.portfolio.recipehog
 import android.app.Application
 import com.portfolio.auth.data.di.authDataModule
 import com.portfolio.auth.presentation.di.authViewModelModule
+import com.portfolio.home.data.di.homeDataModule
+import com.portfolio.home.presentation.di.homeViewModelModule
 import com.portfolio.recipehog.di.mainViewModelModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -24,7 +26,9 @@ class HogApp: Application() {
             modules(
                 authViewModelModule,
                 authDataModule,
-                mainViewModelModule
+                mainViewModelModule,
+                homeDataModule,
+                homeViewModelModule
             )
         }
     }
