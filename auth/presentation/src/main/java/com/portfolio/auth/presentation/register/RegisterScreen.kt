@@ -148,7 +148,6 @@ private fun RegisterScreen(
                 hint = "example@email.com",
                 title = "Email",
                 error = if (state.isEmailValid) null else stringResource(id = R.string.must_be_valid_email)
-
             )
             HogPasswordTextField(
                 state = state.password,

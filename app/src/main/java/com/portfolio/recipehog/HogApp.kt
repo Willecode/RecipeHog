@@ -3,9 +3,14 @@ package com.portfolio.recipehog
 import android.app.Application
 import com.portfolio.auth.data.di.authDataModule
 import com.portfolio.auth.presentation.di.authViewModelModule
+import com.portfolio.core.data.di.coreDataModule
+import com.portfolio.data.di.discoverDataModule
 import com.portfolio.home.data.di.homeDataModule
 import com.portfolio.home.presentation.di.homeViewModelModule
-import com.portfolio.recipehog.di.mainViewModelModule
+import com.portfolio.presentation.di.discoverViewModelModule
+import com.portfolio.recipe.data.di.recipeDataModule
+import com.portfolio.recipe.presentation.di.recipePresentationModule
+import com.portfolio.recipehog.di.mainModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
@@ -26,9 +31,14 @@ class HogApp: Application() {
             modules(
                 authViewModelModule,
                 authDataModule,
-                mainViewModelModule,
+                mainModule,
                 homeDataModule,
-                homeViewModelModule
+                homeViewModelModule,
+                recipeDataModule,
+                recipePresentationModule,
+                coreDataModule,
+                discoverDataModule,
+                discoverViewModelModule
             )
         }
     }

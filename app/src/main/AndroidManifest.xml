@@ -4,6 +4,8 @@
     <!-- android:networkSecurityConfig="@xml/network_security_config" is for enabling
      cleartext traffic to the firebase local emulator, and needed for the debug build of RecipeHog.
      It should be removed in production.-->
+    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:networkSecurityConfig="@xml/network_security_config"
         android:name=".HogApp"

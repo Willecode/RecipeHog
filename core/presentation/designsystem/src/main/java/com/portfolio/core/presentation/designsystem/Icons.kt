@@ -35,3 +35,63 @@ val LogoutIcon: ImageVector
 val PersonIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.outline_person_24)
+
+val SearchIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_search_24)
+
+val BrokenImage: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.baseline_broken_image_24)
+
+val HomeIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_home_24)
+
+val AddIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_add_24)
+
+val BookmarkIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_bookmark_border_24)
+
+val BookmarkAddedIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.baseline_bookmark_added_24)
+
+val ClockIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_access_time_24)
+
+val HeartIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_favorite_border_24)
+
+val HeartIconFilled: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.baseline_favorite_24)
+
+val BackIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_arrow_back_24)
+
+val CameraIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_camera_alt_24)
+
+val GalleryIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_image_24)
+
+val DropDownIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_arrow_drop_down_24)
+
+val DeleteIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_delete_24)
+
+val DotMenuIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_more_vert_24)

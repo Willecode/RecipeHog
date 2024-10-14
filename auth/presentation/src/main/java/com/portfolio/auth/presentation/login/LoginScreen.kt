@@ -35,9 +35,9 @@ import com.portfolio.core.presentation.designsystem.RecipeHogTheme
 import com.portfolio.core.presentation.designsystem.Roboto
 import com.portfolio.core.presentation.designsystem.components.BlurredImageBackground
 import com.portfolio.core.presentation.designsystem.components.HogIntroActionButton
-import com.portfolio.core.presentation.designsystem.components.HogPasswordTextField
 import com.portfolio.core.presentation.designsystem.components.HogIntroTextField
 import com.portfolio.core.presentation.designsystem.components.HogLogo
+import com.portfolio.core.presentation.designsystem.components.HogPasswordTextField
 import com.portfolio.core.presentation.ui.ObserveAsEvents
 import org.koin.androidx.compose.koinViewModel
 
@@ -105,6 +105,16 @@ fun LoginScreen(
     onAction: (LoginAction) -> Unit
 ) {
     BlurredImageBackground(image = painterResource(id = R.drawable.soup)) {}
+    LoginForm(state, onAction)
+}
+
+
+
+@Composable
+private fun LoginForm(
+    state: LoginState,
+    onAction: (LoginAction) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -191,6 +201,24 @@ private fun RegisterClickableText(onTextClick: () -> Unit) {
 @Preview
 @Composable
 private fun LoginScreenPreview() {
+    RecipeHogTheme {
+        LoginScreen(
+            state = LoginState(
+                email = TextFieldState(),
+                password = TextFieldState(),
+                isPasswordVisible = false,
+                isLoggingIn = false,
+                canLogin = true
+            ),
+            onAction = {}
+        )
+    }
+
+}
+
+@Preview
+@Composable
+private fun UserNameFormPreview() {
     RecipeHogTheme {
         LoginScreen(
             state = LoginState(

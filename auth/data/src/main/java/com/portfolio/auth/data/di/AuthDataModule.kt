@@ -7,7 +7,7 @@ import com.portfolio.auth.data.FirebaseSessionStorage
 import com.portfolio.auth.domain.AuthRepository
 import com.portfolio.auth.domain.EmailValidator
 import com.portfolio.auth.domain.RegisterCredentialValidator
-import com.portfolio.core.domain.SessionStorage
+import com.portfolio.core.domain.model.SessionStorage
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.gms.google.services) //Firebase dependency
+    alias(libs.plugins.kotlin.serialization) // for type-safe navigation
 }
 
 android {
@@ -57,8 +58,11 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.koin.compose)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -71,6 +75,11 @@ dependencies {
     implementation(projects.auth.data)
     implementation(projects.home.presentation)
     implementation(projects.home.data)
+    implementation(projects.recipe.presentation)
+    implementation(projects.recipe.data)
+    implementation(projects.discover.presentation)
+    implementation(projects.discover.data)
     implementation(projects.core.presentation.designsystem)
     implementation(projects.core.domain)
+    implementation(projects.core.data)
 }

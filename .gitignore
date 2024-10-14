@@ -14,6 +14,14 @@ captures/
 # Firebase specific
 google-services.json
 GoogleService-Info.plist
+/EmulatorState
+ui-debug.log
+firebase-debug.log
+firebase.json
+firestore.indexes.json
+firestore.rules
+storage.rules
+functions/
 
 # Gradle
 .gradle

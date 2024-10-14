@@ -47,6 +47,12 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
 
+    implementation(libs.bundles.coil)
+
+    implementation(libs.bundles.camera)
+
+    implementation(projects.core.domain)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

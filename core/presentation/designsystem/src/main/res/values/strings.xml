@@ -2,4 +2,8 @@
 <resources>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
+    <string name="cd_profile_picture">Profile picture</string>
+    <string name="cd_search_icon">Search</string>
+    <string name="search_any_recipes">Search any recipes</string>
+    <string name="navigate_back">Navigate back</string>
 </resources>
