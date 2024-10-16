@@ -133,7 +133,13 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController) {
             HogNavigationSuiteScaffold(
                 navController = navController
             ) {
-                DiscoverScreenRoot()
+                DiscoverScreenRoot(
+                    onRecipeClicked = {recipeId ->
+                        navController.navigate(DestinationViewRecipe(recipeId = recipeId)) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
         }
         composable<DestinationSaved> {

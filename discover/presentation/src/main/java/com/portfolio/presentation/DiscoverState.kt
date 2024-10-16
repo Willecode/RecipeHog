@@ -1,7 +1,10 @@
 package com.portfolio.presentation
 
-import com.portfolio.core.domain.model.RecipePreview
-
 data class DiscoverState(
-    val recipePreviews: List<RecipePreview> = listOf()
+    val loadingMoreRecipes: Boolean = false,
+    val loading: Boolean = true,
+    val throttlingGateOpen: Boolean = true,
+    val offlineMode: Boolean = false,
+    val searchEnabled: Boolean = false,
+    val reachedEndOfData: Boolean = false
 )

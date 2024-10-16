@@ -1,10 +1,10 @@
 package com.portfolio.data
 
-import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
 import com.portfolio.data.data_source.DiscoverDataSource
 import com.portfolio.domain.DiscoverRepository
+import com.portfolio.domain.PaginatedRecipePreviewList
 import kotlinx.coroutines.flow.Flow
 
 class DefaultDiscoverRepository(
@@ -12,12 +12,34 @@ class DefaultDiscoverRepository(
 ): DiscoverRepository{
 
 
-    override fun getRecipes(): Flow<List<RecipePreview>> = dataSource.getRecipes()
+    override fun getRecipes(): Flow<PaginatedRecipePreviewList> = dataSource.getRecipes()
+    override suspend fun loadInitialRecipesFromCache(
+        limit: Int,
+        titleQuery: String
+    ): EmptyResult<DataError.Network> {
+        return dataSource.loadInitialRecipesFromCache(limit = limit, titleQuery = titleQuery)
+    }
 
-    override suspend fun fetchRecipesStart(limit: Int, titleQuery: String): EmptyResult<DataError.Network> =
-        dataSource.fetchRecipesStart(limit, titleQuery)
+    override suspend fun loadMoreRecipesFromCache(
+        limit: Int,
+        titleQuery: String
+    ): EmptyResult<DataError.Network> {
+        return dataSource.loadMoreRecipesFromCache(limit = limit, titleQuery = titleQuery)
+    }
 
-    override suspend fun fetchRecipesContinue(limit: Int, titleQuery: String): EmptyResult<DataError.Network> =
-        dataSource.fetchRecipesContinue(limit, titleQuery)
+    override suspend fun fetchInitialRecipesFromServer(
+        limit: Int,
+        titleQuery: String
+    ): EmptyResult<DataError.Network> {
+        return dataSource.fetchInitialRecipesFromServer(limit = limit, titleQuery = titleQuery)
+    }
+
+    override suspend fun fetchMoreRecipesFromServer(
+        limit: Int,
+        titleQuery: String
+    ): EmptyResult<DataError.Network> {
+        return dataSource.fetchMoreRecipesFromServer(limit = limit, titleQuery = titleQuery)
+    }
+
 
 }

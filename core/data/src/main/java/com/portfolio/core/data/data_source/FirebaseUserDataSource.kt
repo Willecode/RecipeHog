@@ -128,10 +128,23 @@ class FirebaseUserDataSource(
                 .document(USER_BOOKMARKED_RECIPES_DOCUMENT)
 
 
-            val result = savedRecipesRef.update(
-                /* field = */ "${USER_PRIVATE_DATA_BOOKMARKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}",
-                /* value = */ recipe
-            ).await()
+            try {
+                savedRecipesRef.update(
+                    /* field = */ "${USER_PRIVATE_DATA_BOOKMARKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}",
+                    /* value = */ recipe
+                ).await()
+            } catch (e: FirebaseFirestoreException) {
+                when (e.code) {
+                    FirebaseFirestoreException.Code.NOT_FOUND -> {
+                        // Doc didn't exist, create it instead
+                        val data = mapOf(
+                            "${USER_PRIVATE_DATA_BOOKMARKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}" to recipe
+                        )
+                        savedRecipesRef.set(data)
+                    }
+                    else -> throw e
+                }
+            }
 
             return Result.Success(Unit).asEmptyDataResult()
         }
@@ -145,10 +158,23 @@ class FirebaseUserDataSource(
                 .collection(USER_PRIVATE_DATA_COLLECTION)
                 .document(USER_LIKED_RECIPES_DOCUMENT)
 
-            val result = savedRecipesRef.update(
-                /* field = */ "${USER_PRIVATE_DATA_LIKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}",
-                /* value = */ recipe
-            ).await()
+            try {
+                val result = savedRecipesRef.update(
+                    /* field = */ "${USER_PRIVATE_DATA_LIKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}",
+                    /* value = */ recipe
+                ).await()
+            } catch (e: FirebaseFirestoreException) {
+                when (e.code) {
+                    FirebaseFirestoreException.Code.NOT_FOUND -> {
+                        // Doc didn't exist, create it instead
+                        val data = mapOf(
+                            "${USER_PRIVATE_DATA_LIKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}" to recipe
+                        )
+                        savedRecipesRef.set(data)
+                    }
+                    else -> throw e
+                }
+            }
 
             return Result.Success(Unit).asEmptyDataResult()
         }
@@ -201,5 +227,4 @@ class FirebaseUserDataSource(
             }
         }
     }
-
 }
