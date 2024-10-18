@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 
 class HogApp: Application() {
@@ -27,7 +28,7 @@ class HogApp: Application() {
         startKoin {
             androidLogger()
             androidContext(this@HogApp)
-            //workManagerFactory()
+            workManagerFactory()
             modules(
                 authViewModelModule,
                 authDataModule,

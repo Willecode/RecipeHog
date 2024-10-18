@@ -9,7 +9,9 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.portfolio.core.domain.model.IngredientListing
+import com.portfolio.core.domain.util.Result
 import com.portfolio.core.presentation.ui.UiText
+import com.portfolio.core.presentation.ui.asUiText
 import com.portfolio.recipe.domain.RecipeDraft
 import com.portfolio.recipe.domain.RecipeRepository
 import com.portfolio.recipe.presentation.R
@@ -56,7 +58,6 @@ class CreateRecipeViewModel(
     fun onAction(action: CreateRecipeAction) {
         when(action) {
             CreateRecipeAction.OnAddEmptyIngredient -> onAddEmptyIngredient()
-            CreateRecipeAction.OnBackClick -> {/*TODO: Add an "are you sure you want to exit" dialog*/}
             CreateRecipeAction.OnAddPreparationStep -> onAddPreparationStep()
             CreateRecipeAction.DismissRationaleDialog -> state = state.copy(showCameraPermissionRationale = false)
             is CreateRecipeAction.OnDescriptionChanged -> onDescriptionChanged(newDesc = action.newDesc)
@@ -115,6 +116,14 @@ class CreateRecipeViewModel(
     private fun postRecipe(filesDirectory: String) {
         viewModelScope.launch {
             state = state.copy(posting = true)
+
+            // Validations
+            if (!validateInputs()){
+                _eventChannel.send(CreateRecipeEvent.Error(UiText.StringResource(R.string.form_contains_invalid_entries)))
+                state = state.copy(posting = false)
+                return@launch
+            }
+
             val file =
                 withContext(context = Dispatchers.IO) {
                     savePic(filesDirectory)
@@ -124,20 +133,26 @@ class CreateRecipeViewModel(
                 state = state.copy(posting = false)
                 return@launch
             }
-            // Validations
-            if (!validateInputs()){
-                _eventChannel.send(CreateRecipeEvent.Error(UiText.StringResource(R.string.form_contains_invalid_entries)))
-                state = state.copy(posting = false)
-                return@launch
-            }
 
-            // Send request to repo
-            recipeRepository.postRecipe(
+            val result = recipeRepository.postRecipe(
                 recipeDraft = createRecipeDraft(),
                 imageFilePath = file.path
             )
-            _eventChannel.send(CreateRecipeEvent.RecipePostSuccessful)
-            state = state.copy(posting = false)
+
+            withContext(Dispatchers.IO) {
+                file.delete()
+            }
+
+            when (result) {
+                is Result.Error -> {
+                    _eventChannel.send(CreateRecipeEvent.Error(result.error.asUiText()))
+                    state = state.copy(posting = false)
+                }
+                is Result.Success -> {
+                    state = state.copy(posting = false)
+                    _eventChannel.send(CreateRecipeEvent.RecipePostSuccessful)
+                }
+            }
         }
     }
 

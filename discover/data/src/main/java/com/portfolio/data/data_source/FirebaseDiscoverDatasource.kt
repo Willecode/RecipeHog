@@ -2,9 +2,9 @@ package com.portfolio.data.data_source
 
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Source
 import com.portfolio.core.data.FirebaseConstants.RECIPE_PREVIEWS_COLLECTION
+import com.portfolio.core.data.util.firestoreSafeCall
 import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
@@ -69,7 +69,7 @@ class FirebaseDiscoverDatasource(
         source: Source
     ): EmptyResult<DataError.Network> {
 
-        return safeCall{
+        return firestoreSafeCall{
             val querySnapshot = firestore
                 .collection(RECIPE_PREVIEWS_COLLECTION)
                 .whereGreaterThanOrEqualTo("title", titleQuery)
@@ -95,7 +95,7 @@ class FirebaseDiscoverDatasource(
         titleQuery: String,
         source: Source
     ): EmptyResult<DataError.Network> {
-        return safeCall{
+        return firestoreSafeCall{
             val querySnapshot = firestore
                 .collection(RECIPE_PREVIEWS_COLLECTION)
                 .whereGreaterThanOrEqualTo("title", titleQuery)
@@ -117,18 +117,6 @@ class FirebaseDiscoverDatasource(
             }
 
             return Result.Success(Unit).asEmptyDataResult()
-        }
-    }
-
-    private suspend inline fun <reified T> safeCall(function: suspend () -> Result<T, DataError.Network>): Result<T, DataError.Network> {
-        return try {
-            function()
-        } catch (e: FirebaseFirestoreException) {
-            return when (e.code) {
-                FirebaseFirestoreException.Code.UNAVAILABLE -> Result.Error(DataError.Network.NO_INTERNET)
-                FirebaseFirestoreException.Code.UNAUTHENTICATED -> Result.Error(DataError.Network.UNAUTHORIZED)
-                else -> Result.Error(DataError.Network.UNKNOWN)
-            }
         }
     }
 

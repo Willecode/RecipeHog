@@ -127,7 +127,11 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController) {
             )
         }
         composable<DestinationCreateRecipe> {
-            CreateRecipeScreenRoot()
+            CreateRecipeScreenRoot(
+                onSuccessfullyPosted = {
+                    navController.popBackStack()
+                }
+            )
         }
         composable<DestinationDiscover> {
             HogNavigationSuiteScaffold(

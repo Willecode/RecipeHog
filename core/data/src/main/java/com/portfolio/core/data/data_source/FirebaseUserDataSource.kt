@@ -14,6 +14,7 @@ import com.portfolio.core.data.FirebaseConstants.USER_PRIVATE_DATA_LIKED_RECIPES
 import com.portfolio.core.data.data_source.util.PublicUserDataSerializable
 import com.portfolio.core.data.data_source.util.toPrivateUserData
 import com.portfolio.core.data.data_source.util.toPublicUserData
+import com.portfolio.core.data.util.firestoreSafeCall
 import com.portfolio.core.domain.model.Recipe
 import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.model.UserData
@@ -40,7 +41,7 @@ class FirebaseUserDataSource(
     }
 
     override suspend fun likeRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return safeCall{
+        return firestoreSafeCall{
             val snapshot = firestore
                 .collection(RECIPES_COLLECTION)
                 .document(recipeId)
@@ -57,12 +58,12 @@ class FirebaseUserDataSource(
             val recipe = snapshot.toObject(Recipe::class.java)!!
             recipe.recipeId = recipeId
 
-            return@safeCall likeRecipe(userId = userId, recipe = recipe.toRecipePreview())
+            return@firestoreSafeCall likeRecipe(userId = userId, recipe = recipe.toRecipePreview())
         }
     }
 
     override suspend fun unlikeRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return safeCall {
+        return firestoreSafeCall {
             val likedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -75,12 +76,12 @@ class FirebaseUserDataSource(
 
             likedRecipesRef.update(updates).await()
 
-            return@safeCall Result.Success(Unit).asEmptyDataResult()
+            return@firestoreSafeCall Result.Success(Unit).asEmptyDataResult()
         }
     }
 
     override suspend fun bookmarkRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return safeCall{
+        return firestoreSafeCall{
             val snapshot = firestore
                 .collection(RECIPES_COLLECTION)
                 .document(recipeId)
@@ -97,12 +98,12 @@ class FirebaseUserDataSource(
             val recipe = snapshot.toObject(Recipe::class.java)!!
             recipe.recipeId = recipeId
 
-            return@safeCall bookmarkRecipe(userId = userId, recipe = recipe.toRecipePreview())
+            return@firestoreSafeCall bookmarkRecipe(userId = userId, recipe = recipe.toRecipePreview())
         }
     }
 
     override suspend fun unbookmarkRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return safeCall {
+        return firestoreSafeCall {
             val likedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -115,12 +116,12 @@ class FirebaseUserDataSource(
 
             likedRecipesRef.update(updates).await()
 
-            return@safeCall Result.Success(Unit).asEmptyDataResult()
+            return@firestoreSafeCall Result.Success(Unit).asEmptyDataResult()
         }
     }
 
     private suspend fun bookmarkRecipe(userId: String, recipe: RecipePreview): EmptyResult<DataError.Network> {
-        return safeCall{
+        return firestoreSafeCall{
             val savedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -151,7 +152,7 @@ class FirebaseUserDataSource(
     }
 
     private suspend fun likeRecipe(userId: String, recipe: RecipePreview): EmptyResult<DataError.Network> {
-        return safeCall{
+        return firestoreSafeCall{
             val savedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -181,7 +182,7 @@ class FirebaseUserDataSource(
     }
 
     private suspend fun getUserData(userId: String, source: Source, includePrivateData: Boolean): Result<UserData, DataError.Network> {
-        return safeCall {
+        return firestoreSafeCall {
             val publicDataRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -213,18 +214,6 @@ class FirebaseUserDataSource(
             )
 
             return Result.Success(userData)
-        }
-    }
-
-    private suspend inline fun <reified T> safeCall(function: suspend () -> Result<T, DataError.Network>): Result<T, DataError.Network> {
-        return try {
-            function()
-        } catch (e: FirebaseFirestoreException) {
-            return when (e.code) {
-                FirebaseFirestoreException.Code.UNAVAILABLE -> Result.Error(DataError.Network.NO_INTERNET)
-                FirebaseFirestoreException.Code.UNAUTHENTICATED -> Result.Error(DataError.Network.UNAUTHORIZED)
-                else -> Result.Error(DataError.Network.UNKNOWN)
-            }
         }
     }
 }
