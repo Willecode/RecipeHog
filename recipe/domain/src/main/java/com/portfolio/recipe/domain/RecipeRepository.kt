@@ -10,14 +10,9 @@ interface RecipeRepository {
     suspend fun postRecipe(recipeDraft: RecipeDraft, imageFilePath: String): EmptyResult<DataError.Network>
 
     /**
-     * Tries to fetch content from server. On failure, reads the content from the cache.
-     */
-    suspend fun getRecipe(recipeId: String): Result<Recipe, DataError.Network>
-
-    /**
      * Reads content from cache.
      */
-    suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError.Network>
+    suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError>
 
     /**
      * Fetches content from the remote server.

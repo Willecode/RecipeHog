@@ -16,14 +16,14 @@ class DefaultDiscoverRepository(
     override suspend fun loadInitialRecipesFromCache(
         limit: Int,
         titleQuery: String
-    ): EmptyResult<DataError.Network> {
+    ): EmptyResult<DataError> {
         return dataSource.loadInitialRecipesFromCache(limit = limit, titleQuery = titleQuery)
     }
 
     override suspend fun loadMoreRecipesFromCache(
         limit: Int,
         titleQuery: String
-    ): EmptyResult<DataError.Network> {
+    ): EmptyResult<DataError> {
         return dataSource.loadMoreRecipesFromCache(limit = limit, titleQuery = titleQuery)
     }
 

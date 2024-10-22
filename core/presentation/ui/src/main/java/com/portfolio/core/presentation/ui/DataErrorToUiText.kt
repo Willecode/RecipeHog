@@ -25,6 +25,18 @@ fun DataError.asUiText(): UiText {
         DataError.Network.SERIALIZATION -> UiText.StringResource(
             R.string.error_serialization
         )
+        DataError.Local.UNAVAILABLE -> UiText.StringResource(
+            R.string.error_resource_not_in_cache
+        )
+        DataError.Network.UNAUTHORIZED -> UiText.StringResource(
+            R.string.error_unauthorized
+        )
+        DataError.Network.UNKNOWN -> UiText.StringResource(
+            R.string.error_unknown
+        )
+        DataError.Network.UNAVAILABLE -> UiText.StringResource(
+            R.string.error_failed_to_get_resource_from_server
+        )
         else -> UiText.StringResource(R.string.error_unknown)
     }
 }

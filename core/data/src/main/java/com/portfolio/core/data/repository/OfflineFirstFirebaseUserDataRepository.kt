@@ -16,7 +16,7 @@ class OfflineFirstFirebaseUserDataRepository(
         return userDataSource.getUserData(userId = userId, includePrivateData = false)
     }
 
-    override suspend fun getUserDataFromCache(userId: String): Result<UserData, DataError.Network> {
+    override suspend fun getUserDataFromCache(userId: String): Result<UserData, DataError> {
         return userDataSource.getUserDataFromCache(userId = userId, includePrivateData = false)
     }
 
@@ -29,7 +29,7 @@ class OfflineFirstFirebaseUserDataRepository(
         return userDataSource.getUserData(userId = uid, includePrivateData = true)
     }
 
-    override suspend fun getCurrentUserDataFromCache(): Result<UserData, DataError.Network> {
+    override suspend fun getCurrentUserDataFromCache(): Result<UserData, DataError> {
         val uid = sessionStorage.get()?.userId ?: return Result.Error(DataError.Network.UNAUTHORIZED)
         return userDataSource.getUserDataFromCache(userId = uid, includePrivateData = true)
 

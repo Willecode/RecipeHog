@@ -84,7 +84,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CreateRecipeScreenRoot(
     viewModel: CreateRecipeViewModel = koinViewModel(),
-    onSuccessfullyPosted: () -> Unit
+    onSuccessfullyPosted: () -> Unit,
+    onAuthError: () -> Unit
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -93,7 +94,8 @@ fun CreateRecipeScreenRoot(
             event = event,
             keyboardController = keyboardController,
             context = context,
-            onSuccessfullyPosted
+            onSuccessfullyPosted = onSuccessfullyPosted,
+            onAuthError = onAuthError
         )
     }
 
@@ -137,7 +139,8 @@ private fun eventHandler(
     event: CreateRecipeEvent,
     keyboardController: SoftwareKeyboardController?,
     context: Context,
-    onSuccessfullyPosted: () -> Unit
+    onSuccessfullyPosted: () -> Unit,
+    onAuthError: () -> Unit
 ) {
     when (event) {
         is CreateRecipeEvent.Error -> {
@@ -150,6 +153,7 @@ private fun eventHandler(
         }
 
         CreateRecipeEvent.RecipePostSuccessful -> onSuccessfullyPosted()
+        CreateRecipeEvent.AuthError -> { onAuthError() }
     }
 }
 

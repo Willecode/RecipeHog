@@ -12,7 +12,7 @@ import com.portfolio.core.domain.util.Result
  */
 interface UserDataSource {
     suspend fun getUserData(userId: String, includePrivateData: Boolean): Result<UserData, DataError.Network>
-    suspend fun getUserDataFromCache(userId: String, includePrivateData: Boolean): Result<UserData, DataError.Network>
+    suspend fun getUserDataFromCache(userId: String, includePrivateData: Boolean): Result<UserData, DataError>
     suspend fun getUserDataFromServer(userId: String, includePrivateData: Boolean): Result<UserData, DataError.Network>
     suspend fun likeRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network>
     suspend fun unlikeRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network>

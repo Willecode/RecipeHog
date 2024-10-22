@@ -72,6 +72,7 @@ dependencies {
     debugImplementation(libs.bundles.compose.debug)
 
     implementation(projects.auth.presentation)
+    implementation(projects.auth.domain)
     implementation(projects.auth.data)
     implementation(projects.home.presentation)
     implementation(projects.home.data)

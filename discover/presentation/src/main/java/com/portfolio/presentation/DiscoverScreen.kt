@@ -45,7 +45,8 @@ import com.portfolio.core.presentation.ui.ObserveAsEvents
 @Composable
 fun DiscoverScreenRoot(
     viewModel: DiscoverViewModel = org.koin.androidx.compose.koinViewModel(),
-    onRecipeClicked: (String) -> Unit
+    onRecipeClicked: (String) -> Unit,
+    onAuthError: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -54,7 +55,8 @@ fun DiscoverScreenRoot(
         eventHandler(
             event = event,
             keyboardController = keyboardController,
-            context = context
+            context = context,
+            onAuthError = onAuthError
         )
     }
 
@@ -65,14 +67,15 @@ fun DiscoverScreenRoot(
         onAction = viewModel::onAction,
         searchText = searchText,
         recipePreviews = recipePreviews,
-        onRecipeClicked
+        onRecipeClicked = onRecipeClicked
     )
 }
 
 private fun eventHandler(
     event: DiscoverEvent,
     keyboardController: SoftwareKeyboardController?,
-    context: Context
+    context: Context,
+    onAuthError: () -> Unit
 ) {
     when (event) {
         is DiscoverEvent.Error -> {
@@ -83,6 +86,8 @@ private fun eventHandler(
                 Toast.LENGTH_LONG
             ).show()
         }
+
+        DiscoverEvent.AuthError -> { onAuthError() }
     }
 }
 

@@ -9,7 +9,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import com.portfolio.core.data.FirebaseConstants.RECIPES_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.RECIPE_PREVIEWS_COLLECTION
-import com.portfolio.core.data.util.firestoreSafeCall
+import com.portfolio.core.data.util.firestoreSafeCallCache
+import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.domain.model.IngredientListing
 import com.portfolio.core.domain.model.Recipe
 import com.portfolio.core.domain.util.DataError
@@ -29,12 +30,16 @@ class FirebaseRecipeDataSource(
     private val storage: FirebaseStorage,
     private val deleteStorageFileScheduler: DeleteStorageFileScheduler
 ): RecipeDataSource {
-    override suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError.Network> {
-        return getRecipe(recipeId = recipeId, source = Source.CACHE)
+    override suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError> {
+        return firestoreSafeCallCache {
+            getRecipe(recipeId = recipeId, source = Source.CACHE)
+        }
     }
 
     override suspend fun getRecipeFromServer(recipeId: String): Result<Recipe, DataError.Network> {
-        return getRecipe(recipeId = recipeId, source = Source.SERVER)
+        return firestoreSafeCallServer {
+            getRecipe(recipeId = recipeId, source = Source.SERVER)
+        }
     }
 
     override suspend fun postRecipe(
@@ -43,7 +48,7 @@ class FirebaseRecipeDataSource(
         username: String,
         userId: String
     ): EmptyResult<DataError.Network> {
-        return firestoreSafeCall {
+        return firestoreSafeCallServer {
             val storageUploadPath = generateStorageUploadPath()
             val imgUrl = tryUploadImage(imageFilePath, storageUploadPath)
             try {
@@ -159,12 +164,7 @@ class FirebaseRecipeDataSource(
 
     private fun generateRandomId() = UUID.randomUUID().toString()
 
-    override suspend fun getRecipe(recipeId: String): Result<Recipe, DataError.Network> {
-        return getRecipe(recipeId = recipeId, source = Source.DEFAULT)
-    }
-
     private suspend fun getRecipe(recipeId: String, source: Source): Result<Recipe, DataError.Network> {
-        return firestoreSafeCall {
             val snapshot = firestore.collection("recipes")
                 .document(recipeId)
                 .get(source)
@@ -177,8 +177,6 @@ class FirebaseRecipeDataSource(
             val recipe = snapshot.toObject(Recipe::class.java)!!
 
             return Result.Success(recipe)
-
-        }
     }
 
     data class RecipeUploadable(

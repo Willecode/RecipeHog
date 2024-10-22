@@ -28,7 +28,7 @@ fun NavigationRoot(
             DestinationContent else DestinationAuth
     ) {
         authGraph(navController, viewModel)
-        contentGraph(navController)
+        contentGraph(navController, viewModel)
     }
 }
 
@@ -106,10 +106,21 @@ fun NavGraphBuilder.authGraph(navController: NavHostController, viewModel: MainV
     }
 }
 
-fun NavGraphBuilder.contentGraph(navController: NavHostController) {
+fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: MainViewModel) {
     navigation<DestinationContent>(
         startDestination = DestinationHome
     ) {
+        fun logOutUser() {
+            viewModel.logOut(
+                onSuccessfulLogout = {
+                    navController.navigate(route = DestinationAuth){
+                        popUpTo(route = DestinationContent) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
         composable<DestinationHome> {
             HogNavigationSuiteScaffold(
                 navController = navController
@@ -117,20 +128,28 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController) {
                 HomeScreenRoot(
                     onRecipeClick = {recipeId ->
                         navController.navigate(DestinationViewRecipe(recipeId = recipeId))
+                    },
+                    onLogoutClick = {
+                        logOutUser()
+                    },
+                    onAuthError = {
+                        logOutUser()
                     }
                 )
             }
         }
         composable<DestinationViewRecipe> {
             ViewRecipeScreenRoot(
-                onBackPress = { navController.popBackStack() }
+                onBackPress = { navController.popBackStack() },
+                onAuthError = { logOutUser() }
             )
         }
         composable<DestinationCreateRecipe> {
             CreateRecipeScreenRoot(
                 onSuccessfullyPosted = {
                     navController.popBackStack()
-                }
+                },
+                onAuthError = { logOutUser() }
             )
         }
         composable<DestinationDiscover> {
@@ -142,7 +161,8 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController) {
                         navController.navigate(DestinationViewRecipe(recipeId = recipeId)) {
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    onAuthError = { logOutUser() }
                 )
             }
         }

@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.portfolio.core.domain.model.SessionStorage
+import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.Result
-import com.portfolio.core.presentation.ui.UiText
 import com.portfolio.core.presentation.ui.asUiText
 import com.portfolio.home.domain.HomeRepository
 import kotlinx.coroutines.channels.Channel
@@ -38,7 +38,7 @@ class HomeViewModel(
         state = state.copy(isLoading = true)
         when (val result = homeRepository.getContentFromCache()) {
             is Result.Error -> {
-                _eventChannel.send(HomeEvent.HomeError(UiText.DynamicString("oops")))
+                handleError(result.error)
             }
             is Result.Success -> {
                 state = state.copy(contentList = result.data)
@@ -51,13 +51,23 @@ class HomeViewModel(
         state = state.copy(isFetchingContent = true)
         when (val result = homeRepository.getContentFromServer()) {
             is Result.Error -> {
-                _eventChannel.send(HomeEvent.HomeError(result.error.asUiText()))
+                handleError(result.error)
             }
             is Result.Success -> {
                 state = state.copy(contentList = result.data)
             }
         }
         state = state.copy(isFetchingContent = false)
+    }
+
+    private suspend fun handleError(error: DataError) {
+        if (error == DataError.Network.UNAUTHORIZED)
+            _eventChannel.send(HomeEvent.AuthError)
+        when (error) {
+            DataError.Local.UNAVAILABLE -> Unit
+            DataError.Network.UNAVAILABLE -> Unit
+            else -> _eventChannel.send(HomeEvent.HomeError(error.asUiText()))
+        }
     }
 
     fun onAction(homeAction: HomeAction) {

@@ -5,4 +5,5 @@ import com.portfolio.core.presentation.ui.UiText
 sealed interface CreateRecipeEvent {
     data class Error(val error: UiText): CreateRecipeEvent
     data object RecipePostSuccessful: CreateRecipeEvent
+    data object AuthError: CreateRecipeEvent
 }

@@ -4,7 +4,8 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.portfolio.core.data.FirebaseConstants.RECIPE_PREVIEWS_COLLECTION
-import com.portfolio.core.data.util.firestoreSafeCall
+import com.portfolio.core.data.util.firestoreSafeCallCache
+import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
@@ -38,29 +39,37 @@ class FirebaseDiscoverDatasource(
     override suspend fun loadInitialRecipesFromCache(
         limit: Int,
         titleQuery: String
-    ): EmptyResult<DataError.Network> {
-        return fetchInitialRecipes(limit = limit, titleQuery = titleQuery, source = Source.CACHE)
+    ): EmptyResult<DataError> {
+        return firestoreSafeCallCache {
+            fetchInitialRecipes(limit = limit, titleQuery = titleQuery, source = Source.CACHE)
+        }
     }
 
     override suspend fun loadMoreRecipesFromCache(
         limit: Int,
         titleQuery: String
-    ): EmptyResult<DataError.Network> {
-        return fetchMoreRecipes(limit = limit, titleQuery = titleQuery, source = Source.CACHE)
+    ): EmptyResult<DataError> {
+        return firestoreSafeCallCache {
+            fetchMoreRecipes(limit = limit, titleQuery = titleQuery, source = Source.CACHE)
+        }
     }
 
     override suspend fun fetchInitialRecipesFromServer(
         limit: Int,
         titleQuery: String
     ): EmptyResult<DataError.Network> {
-        return fetchInitialRecipes(limit = limit, titleQuery = titleQuery, source = Source.SERVER)
+        return firestoreSafeCallServer {
+            fetchInitialRecipes(limit = limit, titleQuery = titleQuery, source = Source.SERVER)
+        }
     }
 
     override suspend fun fetchMoreRecipesFromServer(
         limit: Int,
         titleQuery: String
     ): EmptyResult<DataError.Network> {
-        return fetchMoreRecipes(limit = limit, titleQuery = titleQuery, source = Source.SERVER)
+        return firestoreSafeCallServer {
+            fetchMoreRecipes(limit = limit, titleQuery = titleQuery, source = Source.SERVER)
+        }
     }
 
     private suspend fun fetchInitialRecipes(
@@ -68,26 +77,23 @@ class FirebaseDiscoverDatasource(
         titleQuery: String,
         source: Source
     ): EmptyResult<DataError.Network> {
+        val querySnapshot = firestore
+            .collection(RECIPE_PREVIEWS_COLLECTION)
+            .whereGreaterThanOrEqualTo("title", titleQuery)
+            .whereLessThanOrEqualTo("title", titleQuery + "\uf8ff")
+            .orderBy("title")
+            .limit(limit.toLong())
+            .get(source)
+            .await()
 
-        return firestoreSafeCall{
-            val querySnapshot = firestore
-                .collection(RECIPE_PREVIEWS_COLLECTION)
-                .whereGreaterThanOrEqualTo("title", titleQuery)
-                .whereLessThanOrEqualTo("title", titleQuery + "\uf8ff")
-                .orderBy("title")
-                .limit(limit.toLong())
-                .get(source)
-                .await()
-
-            _documentFlow.update {
-                PaginatedDocumentSnapshots(
-                    documents = querySnapshot.documents,
-                    reachedEndOfData = querySnapshot.documents.size < limit
-                )
-            }
-
-            return Result.Success(Unit).asEmptyDataResult()
+        _documentFlow.update {
+            PaginatedDocumentSnapshots(
+                documents = querySnapshot.documents,
+                reachedEndOfData = querySnapshot.documents.size < limit
+            )
         }
+
+        return Result.Success(Unit).asEmptyDataResult()
     }
 
     private suspend fun fetchMoreRecipes(
@@ -95,29 +101,27 @@ class FirebaseDiscoverDatasource(
         titleQuery: String,
         source: Source
     ): EmptyResult<DataError.Network> {
-        return firestoreSafeCall{
-            val querySnapshot = firestore
-                .collection(RECIPE_PREVIEWS_COLLECTION)
-                .whereGreaterThanOrEqualTo("title", titleQuery)
-                .whereLessThanOrEqualTo("title", titleQuery + "\uf8ff")
-                .orderBy("title")
-                .startAfter(_documentFlow.value.documents.last())
-                .limit(limit.toLong())
-                .get(source)
-                .await()
+        val querySnapshot = firestore
+            .collection(RECIPE_PREVIEWS_COLLECTION)
+            .whereGreaterThanOrEqualTo("title", titleQuery)
+            .whereLessThanOrEqualTo("title", titleQuery + "\uf8ff")
+            .orderBy("title")
+            .startAfter(_documentFlow.value.documents.last())
+            .limit(limit.toLong())
+            .get(source)
+            .await()
 
-            val newDocs = _documentFlow.value.documents.toMutableList()
-            newDocs.addAll(querySnapshot.documents)
+        val newDocs = _documentFlow.value.documents.toMutableList()
+        newDocs.addAll(querySnapshot.documents)
 
-            _documentFlow.update {
-                PaginatedDocumentSnapshots(
-                    documents = newDocs,
-                    reachedEndOfData = querySnapshot.documents.size < limit
-                )
-            }
-
-            return Result.Success(Unit).asEmptyDataResult()
+        _documentFlow.update {
+            PaginatedDocumentSnapshots(
+                documents = newDocs,
+                reachedEndOfData = querySnapshot.documents.size < limit
+            )
         }
+
+        return Result.Success(Unit).asEmptyDataResult()
     }
 
     data class RecipePreviewSerializable(

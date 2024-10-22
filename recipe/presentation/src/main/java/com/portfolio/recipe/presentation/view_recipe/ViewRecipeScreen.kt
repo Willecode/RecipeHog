@@ -63,6 +63,7 @@ import com.portfolio.core.presentation.designsystem.ClockIcon
 import com.portfolio.core.presentation.designsystem.HeartIcon
 import com.portfolio.core.presentation.designsystem.HeartIconFilled
 import com.portfolio.core.presentation.designsystem.RecipeHogTheme
+import com.portfolio.core.presentation.designsystem.components.HogProgressIndicatorBox
 import com.portfolio.core.presentation.ui.ObserveAsEvents
 import com.portfolio.core.presentation.ui.formatToUi
 import com.portfolio.recipe.presentation.R
@@ -72,7 +73,8 @@ import org.koin.androidx.compose.koinViewModel
 
 fun ViewRecipeScreenRoot(
     viewModel: ViewRecipeViewModel = koinViewModel(),
-    onBackPress: () -> Unit
+    onBackPress: () -> Unit,
+    onAuthError: () -> Unit
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -80,7 +82,8 @@ fun ViewRecipeScreenRoot(
         eventHandler(
             event = event,
             keyboardController = keyboardController,
-            context = context
+            context = context,
+            onAuthError
         )
     }
 
@@ -100,7 +103,8 @@ fun ViewRecipeScreenRoot(
 private fun eventHandler(
     event: ViewRecipeEvent,
     keyboardController: SoftwareKeyboardController?,
-    context: Context
+    context: Context,
+    onAuthError: () -> Unit
 ) {
     when (event) {
         is ViewRecipeEvent.ViewRecipeError -> {
@@ -111,6 +115,8 @@ private fun eventHandler(
                 Toast.LENGTH_LONG
             ).show()
         }
+
+        ViewRecipeEvent.AuthError -> {onAuthError()}
     }
 }
 
@@ -123,6 +129,8 @@ private fun ViewRecipeScreen(
     if (state.recipe == null) {
         if (state.cantGetRecipe) {
             RecipeNotFoundBox()
+        } else if (state.isLoading) {
+            HogProgressIndicatorBox()
         }
     } else {
         RecipeSheetScaffold(

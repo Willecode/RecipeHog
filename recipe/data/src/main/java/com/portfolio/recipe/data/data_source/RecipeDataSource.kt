@@ -7,7 +7,7 @@ import com.portfolio.core.domain.util.Result
 import com.portfolio.recipe.domain.RecipeDraft
 
 interface RecipeDataSource {
-    suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError.Network>
+    suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError>
     suspend fun getRecipeFromServer(recipeId: String): Result<Recipe, DataError.Network>
     suspend fun postRecipe(
         recipeDraft: RecipeDraft,
@@ -15,5 +15,4 @@ interface RecipeDataSource {
         username: String,
         userId: String
     ): EmptyResult<DataError.Network>
-    suspend fun getRecipe(recipeId: String): Result<Recipe, DataError.Network>
 }

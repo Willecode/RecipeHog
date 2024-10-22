@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface DiscoverRepository {
     fun getRecipes(): Flow<PaginatedRecipePreviewList>
-    suspend fun loadInitialRecipesFromCache(limit: Int, titleQuery: String): EmptyResult<DataError.Network>
-    suspend fun loadMoreRecipesFromCache(limit: Int, titleQuery: String): EmptyResult<DataError.Network>
+    suspend fun loadInitialRecipesFromCache(limit: Int, titleQuery: String): EmptyResult<DataError>
+    suspend fun loadMoreRecipesFromCache(limit: Int, titleQuery: String): EmptyResult<DataError>
     suspend fun fetchInitialRecipesFromServer(limit: Int, titleQuery: String): EmptyResult<DataError.Network>
     suspend fun fetchMoreRecipesFromServer(limit: Int, titleQuery: String): EmptyResult<DataError.Network>
 }

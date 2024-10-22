@@ -5,11 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.portfolio.auth.domain.AuthRepository
 import com.portfolio.core.domain.model.SessionStorage
+import com.portfolio.core.domain.util.Result
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
+    private val authRepository: AuthRepository
 ): ViewModel() {
 
     var state by mutableStateOf(MainState())
@@ -31,4 +34,21 @@ class MainViewModel(
         return true
     }
 
+    fun logOut(onSuccessfulLogout: () -> Unit) {
+        viewModelScope.launch {
+            val result = authRepository.signOut()
+            when(result) {
+                is Result.Error -> {
+                    val userInfo = sessionStorage.get()
+                    if (userInfo == null)
+                        onSuccessfulLogout()
+                    else
+                        Unit //TODO: Is there a case where this can happen? If so, display some error msg in UI
+                }
+                is Result.Success -> {
+                    onSuccessfulLogout()
+                }
+            }
+        }
+    }
 }

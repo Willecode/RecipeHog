@@ -9,6 +9,7 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.portfolio.core.domain.model.IngredientListing
+import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.Result
 import com.portfolio.core.presentation.ui.UiText
 import com.portfolio.core.presentation.ui.asUiText
@@ -147,6 +148,8 @@ class CreateRecipeViewModel(
                 is Result.Error -> {
                     _eventChannel.send(CreateRecipeEvent.Error(result.error.asUiText()))
                     state = state.copy(posting = false)
+                    if (result.error == DataError.Network.UNAUTHORIZED)
+                        _eventChannel.send(CreateRecipeEvent.AuthError)
                 }
                 is Result.Success -> {
                     state = state.copy(posting = false)

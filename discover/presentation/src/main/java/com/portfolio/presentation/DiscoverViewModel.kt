@@ -65,8 +65,11 @@ class DiscoverViewModel(
 
     private suspend fun initState() {
         loadInitialRecipesFromCache()
-        when (fetchInitialRecipesFromNetwork()) {
-            is Result.Error ->  state = state.copy(offlineMode = true)
+        when (val result = fetchInitialRecipesFromNetwork()) {
+            is Result.Error -> {
+                state = state.copy(offlineMode = true)
+                handleError(result.error)
+            }
             is Result.Success -> state = state.copy(offlineMode = false)
         }
     }
@@ -77,29 +80,21 @@ class DiscoverViewModel(
             titleQuery = searchText.value
         )
         when (result) {
-            is Result.Error -> {
-                when (result.error) {
-                    DataError.Network.UNAUTHORIZED -> TODO()
-                    else -> {
-                        _eventChannel.send(DiscoverEvent.Error(result.error.asUiText()))
-                    }
-                }
-            }
+            is Result.Error -> handleError(result.error)
             is Result.Success -> Unit
         }
         return result
     }
 
-    private suspend fun loadInitialRecipesFromCache(): EmptyResult<DataError.Network> {
+    private suspend fun loadInitialRecipesFromCache() {
         val result = discoverRepository.loadInitialRecipesFromCache(
             limit = FETCH_LIMIT,
             titleQuery = searchText.value
         )
         when (result) {
-            is Result.Error -> _eventChannel.send(DiscoverEvent.Error(result.error.asUiText()))
+            is Result.Error -> handleError(result.error)
             is Result.Success -> Unit
         }
-        return result
     }
 
     fun onAction(action: DiscoverAction) {
@@ -133,7 +128,7 @@ class DiscoverViewModel(
             titleQuery = searchText.value
         )
         when (result) {
-            is Result.Error -> _eventChannel.send(DiscoverEvent.Error(result.error.asUiText()))
+            is Result.Error -> handleError(result.error)
             is Result.Success -> Unit
         }
     }
@@ -144,8 +139,18 @@ class DiscoverViewModel(
             titleQuery = searchText.value
         )
         when (result) {
-            is Result.Error -> _eventChannel.send(DiscoverEvent.Error(result.error.asUiText()))
+            is Result.Error -> handleError(result.error)
             is Result.Success -> Unit
+        }
+    }
+
+    private suspend fun handleError(error: DataError) {
+        if (error == DataError.Network.UNAUTHORIZED)
+            _eventChannel.send(DiscoverEvent.AuthError)
+        when (error) {
+            DataError.Local.UNAVAILABLE -> Unit
+            DataError.Network.UNAVAILABLE -> Unit
+            else -> _eventChannel.send(DiscoverEvent.Error(error.asUiText()))
         }
     }
 

@@ -14,7 +14,8 @@ import com.portfolio.core.data.FirebaseConstants.USER_PRIVATE_DATA_LIKED_RECIPES
 import com.portfolio.core.data.data_source.util.PublicUserDataSerializable
 import com.portfolio.core.data.data_source.util.toPrivateUserData
 import com.portfolio.core.data.data_source.util.toPublicUserData
-import com.portfolio.core.data.util.firestoreSafeCall
+import com.portfolio.core.data.util.firestoreSafeCallCache
+import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.domain.model.Recipe
 import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.model.UserData
@@ -29,19 +30,25 @@ class FirebaseUserDataSource(
     private val firestore: FirebaseFirestore
 ) : UserDataSource {
     override suspend fun getUserData(userId: String, includePrivateData: Boolean): Result<UserData, DataError.Network> {
-        return getUserData(userId = userId, source = Source.DEFAULT, includePrivateData = includePrivateData)
+        return firestoreSafeCallServer {
+            getUserData(userId = userId, source = Source.DEFAULT, includePrivateData = includePrivateData)
+        }
     }
 
-    override suspend fun getUserDataFromCache(userId: String, includePrivateData: Boolean): Result<UserData, DataError.Network> {
-        return getUserData(userId = userId, source = Source.CACHE, includePrivateData = includePrivateData)
+    override suspend fun getUserDataFromCache(userId: String, includePrivateData: Boolean): Result<UserData, DataError> {
+        return firestoreSafeCallCache {
+            getUserData(userId = userId, source = Source.CACHE, includePrivateData = includePrivateData)
+        }
     }
 
     override suspend fun getUserDataFromServer(userId: String, includePrivateData: Boolean): Result<UserData, DataError.Network> {
-        return getUserData(userId = userId, source = Source.SERVER, includePrivateData = includePrivateData)
+        return firestoreSafeCallServer {
+            getUserData(userId = userId, source = Source.SERVER, includePrivateData = includePrivateData)
+        }
     }
 
     override suspend fun likeRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return firestoreSafeCall{
+        return firestoreSafeCallServer{
             val snapshot = firestore
                 .collection(RECIPES_COLLECTION)
                 .document(recipeId)
@@ -58,12 +65,12 @@ class FirebaseUserDataSource(
             val recipe = snapshot.toObject(Recipe::class.java)!!
             recipe.recipeId = recipeId
 
-            return@firestoreSafeCall likeRecipe(userId = userId, recipe = recipe.toRecipePreview())
+            return@firestoreSafeCallServer likeRecipe(userId = userId, recipe = recipe.toRecipePreview())
         }
     }
 
     override suspend fun unlikeRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return firestoreSafeCall {
+        return firestoreSafeCallServer {
             val likedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -76,12 +83,12 @@ class FirebaseUserDataSource(
 
             likedRecipesRef.update(updates).await()
 
-            return@firestoreSafeCall Result.Success(Unit).asEmptyDataResult()
+            return@firestoreSafeCallServer Result.Success(Unit).asEmptyDataResult()
         }
     }
 
     override suspend fun bookmarkRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return firestoreSafeCall{
+        return firestoreSafeCallServer{
             val snapshot = firestore
                 .collection(RECIPES_COLLECTION)
                 .document(recipeId)
@@ -98,12 +105,12 @@ class FirebaseUserDataSource(
             val recipe = snapshot.toObject(Recipe::class.java)!!
             recipe.recipeId = recipeId
 
-            return@firestoreSafeCall bookmarkRecipe(userId = userId, recipe = recipe.toRecipePreview())
+            return@firestoreSafeCallServer bookmarkRecipe(userId = userId, recipe = recipe.toRecipePreview())
         }
     }
 
     override suspend fun unbookmarkRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network> {
-        return firestoreSafeCall {
+        return firestoreSafeCallServer {
             val likedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -116,12 +123,12 @@ class FirebaseUserDataSource(
 
             likedRecipesRef.update(updates).await()
 
-            return@firestoreSafeCall Result.Success(Unit).asEmptyDataResult()
+            return@firestoreSafeCallServer Result.Success(Unit).asEmptyDataResult()
         }
     }
 
     private suspend fun bookmarkRecipe(userId: String, recipe: RecipePreview): EmptyResult<DataError.Network> {
-        return firestoreSafeCall{
+        return firestoreSafeCallServer{
             val savedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -152,7 +159,7 @@ class FirebaseUserDataSource(
     }
 
     private suspend fun likeRecipe(userId: String, recipe: RecipePreview): EmptyResult<DataError.Network> {
-        return firestoreSafeCall{
+        return firestoreSafeCallServer{
             val savedRecipesRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -182,7 +189,6 @@ class FirebaseUserDataSource(
     }
 
     private suspend fun getUserData(userId: String, source: Source, includePrivateData: Boolean): Result<UserData, DataError.Network> {
-        return firestoreSafeCall {
             val publicDataRef = firestore
                 .collection(USER_COLLECTION)
                 .document(userId)
@@ -214,6 +220,5 @@ class FirebaseUserDataSource(
             )
 
             return Result.Success(userData)
-        }
     }
 }

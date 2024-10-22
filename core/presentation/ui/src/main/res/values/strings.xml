@@ -4,8 +4,11 @@
     <string name="error_request_timeout">Error: Request timed out.</string>
     <string name="error_too_many_requests">Error: Too many requests.</string>
     <string name="error_no_internet">No internet connection.</string>
-    <string name="error_payload_too_large">Error: The file that you tried to upload is too large.</string>
-    <string name="error_server_error">Error: Something went wrong, try again.</string>
-    <string name="error_serialization">Error: Something went wrong, try again.</string>
+    <string name="error_payload_too_large">The file that you tried to upload is too large.</string>
+    <string name="error_server_error">Something went wrong, try again.</string>
+    <string name="error_serialization">Something went wrong, try again.</string>
     <string name="error_unknown">Unknown error occurred.</string>
+    <string name="error_resource_not_in_cache">Resource not in cache</string>
+    <string name="error_unauthorized">Error: Unauthorized</string>
+    <string name="error_failed_to_get_resource_from_server">Failed to get resource from server</string>
 </resources>

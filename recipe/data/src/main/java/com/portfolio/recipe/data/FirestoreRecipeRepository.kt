@@ -14,7 +14,7 @@ class FirestoreRecipeRepository(
     private val sessionStorage: SessionStorage
 ): RecipeRepository {
 
-    override suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError.Network> {
+    override suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError> {
         return recipeDataSource.getRecipeFromCache(recipeId = recipeId)
     }
 
@@ -36,7 +36,4 @@ class FirestoreRecipeRepository(
         )
     }
 
-    override suspend fun getRecipe(recipeId: String): Result<Recipe, DataError.Network> {
-        return recipeDataSource.getRecipe(recipeId = recipeId)
-    }
 }

@@ -5,15 +5,11 @@ import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.Result
 
 interface HomeRepository {
-    /**
-     * Tries to fetch content from server. On failure, reads the content from the cache.
-     */
-    suspend fun getContent(): Result<List<HomeContent>, DataError.Network>
 
     /**
      * Reads content from cache.
      */
-    suspend fun getContentFromCache(): Result<List<HomeContent>, DataError.Network>
+    suspend fun getContentFromCache(): Result<List<HomeContent>, DataError>
 
     /**
      * Fetches content from the remote server.

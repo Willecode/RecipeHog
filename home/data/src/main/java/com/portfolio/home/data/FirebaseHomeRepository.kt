@@ -1,8 +1,9 @@
 package com.portfolio.home.data
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Source
+import com.portfolio.core.data.util.firestoreSafeCallCache
+import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.domain.model.HomeContent
 import com.portfolio.core.domain.model.HomeContent.MultiRecipePreview
 import com.portfolio.core.domain.model.HomeContent.SingleRecipePreview
@@ -15,62 +16,41 @@ import kotlinx.coroutines.tasks.await
 class FirebaseHomeRepository(
     private val firestore: FirebaseFirestore
 ): HomeRepository {
-    override suspend fun getContent(): Result<List<HomeContent>, DataError.Network> {
-        return getContent(source = Source.DEFAULT)
-    }
 
-    override suspend fun getContentFromCache(): Result<List<HomeContent>, DataError.Network> {
-        return getContent(source = Source.CACHE)
+    override suspend fun getContentFromCache(): Result<List<HomeContent>, DataError> {
+        return firestoreSafeCallCache {
+            getContent(source = Source.CACHE)
+        }
     }
 
     override suspend fun getContentFromServer(): Result<List<HomeContent>, DataError.Network> {
-       return getContent(source = Source.SERVER)
+       return firestoreSafeCallServer {
+           getContent(source = Source.SERVER)
+       }
     }
 
     private suspend fun getContent(source: Source): Result<List<HomeContent>, DataError.Network> {
-        try {
-            val snapshot = firestore.collection("homeContent")
-                .get(source)
-                .await()
+        val snapshot = firestore.collection("homeContent")
+            .get(source)
+            .await()
 
-            val data = snapshot.documents.mapNotNull {
-                when (it?.data) {
-                    null -> null
-                    else -> {
-                        val content = it.data!!["content"]
-                        if (content == null) {
-                            it.toObject(HomeContentSerializableSingle::class.java)!!
-                                .toSingleRecipePreview()
-                        } else {
-                            it.toObject(HomeContentSerializableMulti::class.java)!!
-                                .toMultiRecipePreview()
-                        }
+        val data = snapshot.documents.mapNotNull {
+            when (it?.data) {
+                null -> null
+                else -> {
+                    val content = it.data!!["content"]
+                    if (content == null) {
+                        it.toObject(HomeContentSerializableSingle::class.java)!!
+                            .toSingleRecipePreview()
+                    } else {
+                        it.toObject(HomeContentSerializableMulti::class.java)!!
+                            .toMultiRecipePreview()
                     }
                 }
             }
-
-            return Result.Success(data)
-        } catch (e: FirebaseFirestoreException) {
-            return when (e.code) {
-//                FirebaseFirestoreException.Code.CANCELLED -> TODO()
-//                FirebaseFirestoreException.Code.UNKNOWN -> TODO()
-//                FirebaseFirestoreException.Code.INVALID_ARGUMENT -> TODO()
-//                FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> TODO()
-//                FirebaseFirestoreException.Code.NOT_FOUND -> TODO()
-//                FirebaseFirestoreException.Code.ALREADY_EXISTS -> TODO()
-//                FirebaseFirestoreException.Code.PERMISSION_DENIED -> TODO()
-//                FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED -> TODO()
-//                FirebaseFirestoreException.Code.FAILED_PRECONDITION -> TODO()
-//                FirebaseFirestoreException.Code.ABORTED -> TODO()
-//                FirebaseFirestoreException.Code.OUT_OF_RANGE -> TODO()
-//                FirebaseFirestoreException.Code.UNIMPLEMENTED -> TODO()
-//                FirebaseFirestoreException.Code.INTERNAL -> TODO()
-//                FirebaseFirestoreException.Code.DATA_LOSS -> TODO()
-                FirebaseFirestoreException.Code.UNAVAILABLE -> Result.Error(DataError.Network.NO_INTERNET)
-                FirebaseFirestoreException.Code.UNAUTHENTICATED -> Result.Error(DataError.Network.UNAUTHORIZED)
-                else -> Result.Error(DataError.Network.UNKNOWN)
-            }
         }
+
+        return Result.Success(data)
     }
 
     data class HomeContentSerializableSingle(

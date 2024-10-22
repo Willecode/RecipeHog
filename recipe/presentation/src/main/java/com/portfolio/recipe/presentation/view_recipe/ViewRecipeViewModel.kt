@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.portfolio.core.domain.model.ReactiveUserDataRepository
 import com.portfolio.core.domain.use_case.GetCurrentUserLikeAndBookmarkStateUseCase
+import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.Result
-import com.portfolio.core.presentation.ui.UiText
 import com.portfolio.core.presentation.ui.asUiText
 import com.portfolio.recipe.domain.RecipeRepository
 import kotlinx.coroutines.channels.Channel
@@ -41,8 +41,10 @@ class ViewRecipeViewModel(
             }
         }
         viewModelScope.launch {
+            state = state.copy(isLoading = true)
             loadRecipe()
             fetchRecipe()
+            state = state.copy(isLoading = false)
         }
         viewModelScope.launch {
             reactiveUserDataRepository.fetchCurrentUserData()
@@ -50,25 +52,27 @@ class ViewRecipeViewModel(
     }
 
     private suspend fun loadRecipe() {
-        state = state.copy(isLoading = true)
         savedStateHandle.get<String>("recipeId")?.let {
             when (val result = recipeRepository.getRecipeFromCache(it)) {
                 is Result.Error -> {
+                    handleError(error = result.error)
                 }
-
                 is Result.Success -> {
                     state = state.copy(recipe = result.data)
                 }
             }
         }
-        state = state.copy(isLoading = false)
+    }
+
+    private suspend fun sendAuthErrorEvent() {
+        _eventChannel.send(ViewRecipeEvent.AuthError)
     }
 
     private suspend fun fetchRecipe() {
         savedStateHandle.get<String>("recipeId")?.let {
             when (val result = recipeRepository.getRecipeFromServer(it)) {
                 is Result.Error -> {
-                    _eventChannel.send(ViewRecipeEvent.ViewRecipeError(result.error.asUiText()))
+                    handleError(result.error)
                     if (state.recipe == null) {
                         state = state.copy(cantGetRecipe = true)
                     }
@@ -81,15 +85,27 @@ class ViewRecipeViewModel(
         }
     }
 
+    private suspend fun ViewRecipeViewModel.handleError(
+        error: DataError
+    ) {
+        if (error == DataError.Network.UNAUTHORIZED)
+            _eventChannel.send(ViewRecipeEvent.AuthError)
+        when (error) {
+            DataError.Local.UNAVAILABLE -> Unit
+            DataError.Network.UNAVAILABLE -> Unit
+            else -> _eventChannel.send(ViewRecipeEvent.ViewRecipeError(error.asUiText()))
+        }
+    }
+
     private fun likeRecipe() {
         savedStateHandle.get<String>("recipeId")?.let{ recipeId ->
             viewModelScope.launch {
                 val result = reactiveUserDataRepository.likeRecipe(recipeId)
 
                 when (result) {
-                    is Result.Error -> _eventChannel.send(
-                        ViewRecipeEvent.ViewRecipeError(UiText.DynamicString("Oops"))
-                    )
+                    is Result.Error -> {
+                        handleError(result.error)
+                    }
                     is Result.Success -> {
                         loadRecipe()
                     }
@@ -104,9 +120,9 @@ class ViewRecipeViewModel(
                 val result = reactiveUserDataRepository.unlikeRecipe(recipeId)
 
                 when (result) {
-                    is Result.Error -> _eventChannel.send(
-                        ViewRecipeEvent.ViewRecipeError(UiText.DynamicString("Oops"))
-                    )
+                    is Result.Error -> {
+                        handleError(result.error)
+                    }
                     is Result.Success -> {
                         loadRecipe()
                     }
@@ -121,9 +137,9 @@ class ViewRecipeViewModel(
                 val result = reactiveUserDataRepository.bookmarkRecipe(recipeId)
 
                 when (result) {
-                    is Result.Error -> _eventChannel.send(
-                        ViewRecipeEvent.ViewRecipeError(UiText.DynamicString("Oops"))
-                    )
+                    is Result.Error -> {
+                        handleError(result.error)
+                    }
                     is Result.Success -> {
                     }
                 }
@@ -137,9 +153,9 @@ class ViewRecipeViewModel(
                 val result = reactiveUserDataRepository.unbookmarkRecipe(recipeId)
 
                 when (result) {
-                    is Result.Error -> _eventChannel.send(
-                        ViewRecipeEvent.ViewRecipeError(UiText.DynamicString("Oops"))
-                    )
+                    is Result.Error -> {
+                        handleError(result.error)
+                    }
                     is Result.Success -> {
                     }
                 }
