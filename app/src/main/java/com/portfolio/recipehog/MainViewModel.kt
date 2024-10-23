@@ -40,12 +40,15 @@ class MainViewModel(
             when(result) {
                 is Result.Error -> {
                     val userInfo = sessionStorage.get()
-                    if (userInfo == null)
+                    if (userInfo == null) {
+                        state = state.copy(isLoggedIn = false)
                         onSuccessfulLogout()
+                    }
                     else
                         Unit //TODO: Is there a case where this can happen? If so, display some error msg in UI
                 }
                 is Result.Success -> {
+                    state = state.copy(isLoggedIn = false)
                     onSuccessfulLogout()
                 }
             }
