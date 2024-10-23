@@ -15,4 +15,8 @@ interface ReactiveUserDataRepository {
     suspend fun unlikeRecipe(recipeId: String): EmptyResult<DataError.Network>
     suspend fun bookmarkRecipe(recipeId: String): EmptyResult<DataError.Network>
     suspend fun unbookmarkRecipe(recipeId: String): EmptyResult<DataError.Network>
+
+    fun getBookmarkedRecipes(): Flow<List<RecipePreview>>
+    fun getLikedRecipes(): Flow<List<RecipePreview>>
+    suspend fun fetchBookmarksAndLikes(): EmptyResult<DataError.Network>
 }

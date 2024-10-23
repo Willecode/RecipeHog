@@ -4,9 +4,10 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.portfolio.core.data.FirebaseConstants.RECIPE_PREVIEWS_COLLECTION
+import com.portfolio.core.data.util.RecipePreviewSerializable
 import com.portfolio.core.data.util.firestoreSafeCallCache
 import com.portfolio.core.data.util.firestoreSafeCallServer
-import com.portfolio.core.domain.model.RecipePreview
+import com.portfolio.core.data.util.toRecipePreview
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
 import com.portfolio.core.domain.util.Result
@@ -122,24 +123,6 @@ class FirebaseDiscoverDatasource(
         }
 
         return Result.Success(Unit).asEmptyDataResult()
-    }
-
-    data class RecipePreviewSerializable(
-        val title: String = "",
-        val author: String = "",
-        val description: String = "",
-        val imgUrl: String = "",
-        val recipeId: String = ""
-    )
-
-    private fun RecipePreviewSerializable.toRecipePreview(): RecipePreview {
-        return RecipePreview(
-            title = title,
-            author = author,
-            description = description,
-            imgUrl = imgUrl,
-            recipeId = recipeId
-        )
     }
 
     data class PaginatedDocumentSnapshots(

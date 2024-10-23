@@ -6,6 +6,7 @@ data class ViewRecipeState (
     val recipe: Recipe? = null,
     val isLoading: Boolean = true,
     val cantGetRecipe: Boolean = false,
+    val likeBookmarkAvailable: Boolean = false,
     val isRecipeLiked: Boolean = false,
     val isRecipeBookmarked: Boolean = false
 )

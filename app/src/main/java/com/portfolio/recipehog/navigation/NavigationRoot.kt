@@ -11,6 +11,7 @@ import com.portfolio.auth.presentation.intro.IntroScreenRoot
 import com.portfolio.auth.presentation.login.LoginScreenRoot
 import com.portfolio.auth.presentation.register.RegisterScreenRoot
 import com.portfolio.auth.presentation.userinfo.UserInfoScreenRoot
+import com.portfolio.bookmarks.presentation.BookmarksScreenRoot
 import com.portfolio.home.presentation.HomeScreenRoot
 import com.portfolio.presentation.DiscoverScreenRoot
 import com.portfolio.recipe.presentation.create_recipe.CreateRecipeScreenRoot
@@ -121,13 +122,20 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
                 }
             )
         }
-        composable<DestinationHome> {
+
+        fun navigateToViewRecipe(recipeId: String) {
+            navController.navigate(DestinationViewRecipe(recipeId = recipeId)) {
+                launchSingleTop = true
+            }
+        }
+
+            composable<DestinationHome> {
             HogNavigationSuiteScaffold(
                 navController = navController
             ) {
                 HomeScreenRoot(
                     onRecipeClick = {recipeId ->
-                        navController.navigate(DestinationViewRecipe(recipeId = recipeId))
+                        navigateToViewRecipe(recipeId)
                     },
                     onLogoutClick = {
                         logOutUser()
@@ -158,19 +166,22 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
             ) {
                 DiscoverScreenRoot(
                     onRecipeClicked = {recipeId ->
-                        navController.navigate(DestinationViewRecipe(recipeId = recipeId)) {
-                            launchSingleTop = true
-                        }
+                        navigateToViewRecipe(recipeId)
                     },
                     onAuthError = { logOutUser() }
                 )
             }
         }
-        composable<DestinationSaved> {
+        composable<DestinationBookmarks> {
             HogNavigationSuiteScaffold(
                 navController = navController
             ) {
-                Text(text = "Saved")
+                BookmarksScreenRoot(
+                    onRecipeClick = {recipeId ->
+                        navigateToViewRecipe(recipeId)
+                    },
+                    onAuthError = { logOutUser() }
+                )
             }
         }
         composable<DestinationYou> {

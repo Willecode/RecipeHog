@@ -28,6 +28,6 @@ data class DestinationViewRecipe(
 @Serializable
 object DestinationCreateRecipe
 @Serializable
-object DestinationSaved
+object DestinationBookmarks
 @Serializable
 object DestinationYou

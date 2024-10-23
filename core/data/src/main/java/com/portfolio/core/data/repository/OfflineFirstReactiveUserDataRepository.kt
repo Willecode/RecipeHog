@@ -2,6 +2,7 @@ package com.portfolio.core.data.repository
 
 import com.portfolio.core.data.data_source.ReactiveUserDataSource
 import com.portfolio.core.domain.model.ReactiveUserDataRepository
+import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.model.SessionStorage
 import com.portfolio.core.domain.model.UserData
 import com.portfolio.core.domain.util.DataError
@@ -51,5 +52,20 @@ class OfflineFirstReactiveUserDataRepository(
     override suspend fun unbookmarkRecipe(recipeId: String): EmptyResult<DataError.Network> {
         val uid = sessionStorage.get()?.userId ?: return Result.Error(DataError.Network.UNAUTHORIZED)
         return reactiveUserDataSource.unbookmarkRecipe(userId = uid, recipeId = recipeId)
+    }
+
+    override fun getBookmarkedRecipes(): Flow<List<RecipePreview>> {
+        val uid = sessionStorage.get()?.userId ?: return emptyFlow()
+        return reactiveUserDataSource.getBookmarkedRecipes(uid)
+    }
+
+    override fun getLikedRecipes(): Flow<List<RecipePreview>> {
+        val uid = sessionStorage.get()?.userId ?: return emptyFlow()
+        return reactiveUserDataSource.getLikedRecipes(uid)
+    }
+
+    override suspend fun fetchBookmarksAndLikes(): EmptyResult<DataError.Network> {
+        val uid = sessionStorage.get()?.userId ?: return Result.Error(DataError.Network.UNAUTHORIZED)
+        return reactiveUserDataSource.fetchBookmarksAndLikes(uid)
     }
 }

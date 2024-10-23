@@ -1,5 +1,6 @@
 package com.portfolio.core.data.data_source
 
+import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.model.UserData
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
@@ -18,4 +19,8 @@ interface ReactiveUserDataSource {
     suspend fun unlikeRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network>
     suspend fun bookmarkRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network>
     suspend fun unbookmarkRecipe(userId: String, recipeId: String): EmptyResult<DataError.Network>
+
+    fun getBookmarkedRecipes(userId: String): Flow<List<RecipePreview>>
+    fun getLikedRecipes(userId: String): Flow<List<RecipePreview>>
+    suspend fun fetchBookmarksAndLikes(userId: String): EmptyResult<DataError.Network>
 }

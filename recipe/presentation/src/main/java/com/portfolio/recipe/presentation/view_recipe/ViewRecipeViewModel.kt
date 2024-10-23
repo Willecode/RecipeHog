@@ -33,10 +33,15 @@ class ViewRecipeViewModel(
         viewModelScope.launch {
             savedStateHandle.get<String>("recipeId")?.let {
                 getCurrentUserLikeAndBookmarkStateUseCase.invoke(it).collect {bookmarkLikeState ->
-                    state = state.copy(
-                        isRecipeLiked = bookmarkLikeState.isLiked,
-                        isRecipeBookmarked = bookmarkLikeState.isBookmarked
-                    )
+                    if (bookmarkLikeState == null) {
+                        state = state.copy(likeBookmarkAvailable = false)
+                    } else {
+                        state = state.copy(
+                            isRecipeLiked = bookmarkLikeState.isLiked,
+                            isRecipeBookmarked = bookmarkLikeState.isBookmarked,
+                            likeBookmarkAvailable = true
+                        )
+                    }
                 }
             }
         }

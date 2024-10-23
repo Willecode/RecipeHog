@@ -11,13 +11,10 @@ class GetCurrentUserLikeAndBookmarkStateUseCase(
         val isLiked: Boolean,
         val isBookmarked: Boolean
     )
-    operator fun invoke(recipeId: String): Flow<LikeAndBookmarkState> {
+    operator fun invoke(recipeId: String): Flow<LikeAndBookmarkState?> {
         return reactiveUserDataRepository.getCurrentUserData().map { userData ->
             if (userData.privateUserData == null) {
-                LikeAndBookmarkState(
-                    isLiked = false,
-                    isBookmarked = false
-                )
+                null
             } else {
                 LikeAndBookmarkState(
                     isLiked = userData.privateUserData.likedRecipes.containsKey(recipeId),

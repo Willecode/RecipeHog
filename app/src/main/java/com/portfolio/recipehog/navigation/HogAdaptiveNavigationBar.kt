@@ -80,7 +80,7 @@ fun HogNavigationSuiteScaffold(
         NavItem(
             label = "Saved",
             icon = { Icon(BookmarkIcon, "Saved") },
-            destination = DestinationSaved
+            destination = DestinationBookmarks
         ),
         NavItem(
             label = "You",

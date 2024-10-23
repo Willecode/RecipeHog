@@ -146,7 +146,7 @@ class FirebaseUserDataSource(
                     FirebaseFirestoreException.Code.NOT_FOUND -> {
                         // Doc didn't exist, create it instead
                         val data = mapOf(
-                            "${USER_PRIVATE_DATA_BOOKMARKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}" to recipe
+                            USER_PRIVATE_DATA_BOOKMARKED_RECIPES_CONTENT_FIELD to mapOf(recipe.recipeId to recipe)
                         )
                         savedRecipesRef.set(data)
                     }
@@ -176,7 +176,7 @@ class FirebaseUserDataSource(
                     FirebaseFirestoreException.Code.NOT_FOUND -> {
                         // Doc didn't exist, create it instead
                         val data = mapOf(
-                            "${USER_PRIVATE_DATA_LIKED_RECIPES_CONTENT_FIELD}.${recipe.recipeId}" to recipe
+                            USER_PRIVATE_DATA_LIKED_RECIPES_CONTENT_FIELD to mapOf(recipe.recipeId to recipe)
                         )
                         savedRecipesRef.set(data)
                     }

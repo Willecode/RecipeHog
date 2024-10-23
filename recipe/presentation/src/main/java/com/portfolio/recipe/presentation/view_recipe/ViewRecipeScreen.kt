@@ -137,7 +137,8 @@ private fun ViewRecipeScreen(
             recipe = state.recipe,
             onAction = onAction,
             isLiked = state.isRecipeLiked,
-            isBookmarked = state.isRecipeBookmarked
+            isBookmarked = state.isRecipeBookmarked,
+            isLikeBookmarkEnabled = state.likeBookmarkAvailable
         )
     }
     Box(
@@ -158,7 +159,8 @@ private fun RecipeSheetScaffold(
     recipe: Recipe,
     onAction: (ViewRecipeAction) -> Unit,
     isLiked: Boolean,
-    isBookmarked: Boolean
+    isBookmarked: Boolean,
+    isLikeBookmarkEnabled: Boolean
 ) {
 
     val sheetPeekHeight = ((LocalConfiguration.current.screenHeightDp * (2f/3f))).dp
@@ -199,14 +201,20 @@ private fun RecipeSheetScaffold(
                         }
                     }
                     Row {
-                        IconButton(onClick = { onAction(ViewRecipeAction.OnLikeClicked) }) {
+                        IconButton(
+                            onClick = { onAction(ViewRecipeAction.OnLikeClicked) },
+                            enabled = isLikeBookmarkEnabled
+                        ) {
                             Icon(
                                 imageVector = if (isLiked) HeartIconFilled else HeartIcon,
                                 tint = if (isLiked) Color.Red else LocalContentColor.current,
                                 contentDescription = stringResource(id = if (isLiked) R.string.unlike_recipe else R.string.like_recipe)
                             )
                         }
-                        IconButton(onClick = { onAction(ViewRecipeAction.OnBookmarkClicked) }) {
+                        IconButton(
+                            onClick = { onAction(ViewRecipeAction.OnBookmarkClicked) },
+                            enabled = isLikeBookmarkEnabled
+                        ) {
                             Icon(
                                 imageVector = if (isBookmarked) BookmarkAddedIcon else BookmarkIcon,
                                 contentDescription = stringResource(id = if (isBookmarked) R.string.remove_bookmark else R.string.bookmark_recipe)
