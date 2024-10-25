@@ -26,6 +26,10 @@ data class DestinationViewRecipe(
     val recipeId: String
 )
 @Serializable
+data class DestinationReviews(
+    val reviewRecipeId: String
+)
+@Serializable
 object DestinationCreateRecipe
 @Serializable
 object DestinationBookmarks

@@ -5,4 +5,5 @@ sealed interface ViewRecipeAction {
     data object OnBookmarkClicked: ViewRecipeAction
     data class OnAuthorClicked(val authorId: String): ViewRecipeAction
     data object OnBackPress: ViewRecipeAction
+    data object OnReviewsClicked: ViewRecipeAction
 }

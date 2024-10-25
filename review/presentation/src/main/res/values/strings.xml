@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="write_review">Write review</string>
+    <string name="cd_send">Send</string>
+    <string name="review_posted">Review posted</string>
+</resources>

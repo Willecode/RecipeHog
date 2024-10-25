@@ -13,6 +13,8 @@ import com.portfolio.profile.presentation.di.profilePresentationModule
 import com.portfolio.recipe.data.di.recipeDataModule
 import com.portfolio.recipe.presentation.di.recipePresentationModule
 import com.portfolio.recipehog.di.mainModule
+import com.portfolio.review.data.di.reviewDataModule
+import com.portfolio.review.presentation.di.reviewPresentationModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
@@ -43,7 +45,9 @@ class HogApp: Application() {
                 discoverDataModule,
                 discoverViewModelModule,
                 bookmarksPresentationModule,
-                profilePresentationModule
+                profilePresentationModule,
+                reviewDataModule,
+                reviewPresentationModule
             )
         }
     }

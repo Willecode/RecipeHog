@@ -103,3 +103,15 @@ val ArrowRightIcon: ImageVector
 val EditIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.outline_edit_24)
+
+val StarOutlineIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_star_outline_24)
+
+val StarIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_star_24)
+
+val SendIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.baseline_send_24)

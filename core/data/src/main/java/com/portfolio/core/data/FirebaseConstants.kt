@@ -18,4 +18,7 @@ object FirebaseConstants {
     const val RECIPES_COLLECTION = "recipes"
     const val RECIPE_PREVIEWS_COLLECTION = "recipePreviews"
     const val TAGS_COLLECTION = "tags"
+    const val REVIEWS_COLLECTION = "reviews"
+    const val REVIEWS_CONTENT_FIELD = "content"
+
 }

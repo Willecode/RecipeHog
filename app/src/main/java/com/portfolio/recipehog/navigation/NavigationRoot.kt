@@ -18,6 +18,7 @@ import com.portfolio.profile.presentation.view_profile.ViewProfileScreenRoot
 import com.portfolio.recipe.presentation.create_recipe.CreateRecipeScreenRoot
 import com.portfolio.recipe.presentation.view_recipe.ViewRecipeScreenRoot
 import com.portfolio.recipehog.MainViewModel
+import com.portfolio.review.presentation.ReviewScreenRoot
 
 @Composable
 fun NavigationRoot(
@@ -136,6 +137,12 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
             }
         }
 
+        fun navigateToReviews(recipeId: String) {
+            navController.navigate(DestinationReviews(reviewRecipeId = recipeId)) {
+                launchSingleTop = true
+            }
+        }
+
         composable<DestinationHome> {
             HogNavigationSuiteScaffold(
                 navController = navController
@@ -157,7 +164,8 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
             ViewRecipeScreenRoot(
                 onBackPress = { navController.popBackStack() },
                 onAuthError = { logOutUser() },
-                onAuthorClick = { authorId -> navigateToViewUser(userId = authorId)}
+                onAuthorClick = { authorId -> navigateToViewUser(userId = authorId)},
+                onReviewsClicked = {recipeId -> navigateToReviews(recipeId)}
             )
         }
         composable<DestinationCreateRecipe> {
@@ -201,6 +209,13 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
         composable<DestinationViewUser> {
             ViewProfileScreenRoot(
                 onRecipeClick = { recipeId -> navigateToViewRecipe(recipeId = recipeId) },
+                onAuthError = { logOutUser() }
+            )
+        }
+
+        composable<DestinationReviews> {
+            ReviewScreenRoot(
+                onUserClick = { navigateToViewUser(userId = it) },
                 onAuthError = { logOutUser() }
             )
         }

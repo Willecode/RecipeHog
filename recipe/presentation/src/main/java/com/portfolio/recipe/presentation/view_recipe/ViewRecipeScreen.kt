@@ -29,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.portfolio.core.domain.model.IngredientListing
 import com.portfolio.core.domain.model.Recipe
+import com.portfolio.core.presentation.designsystem.ArrowRightIcon
 import com.portfolio.core.presentation.designsystem.BackIcon
 import com.portfolio.core.presentation.designsystem.BookmarkAddedIcon
 import com.portfolio.core.presentation.designsystem.BookmarkIcon
@@ -76,7 +78,8 @@ fun ViewRecipeScreenRoot(
     viewModel: ViewRecipeViewModel = koinViewModel(),
     onBackPress: () -> Unit,
     onAuthorClick: (String) -> Unit,
-    onAuthError: () -> Unit
+    onAuthError: () -> Unit,
+    onReviewsClicked: (String) -> Unit
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -85,7 +88,8 @@ fun ViewRecipeScreenRoot(
             event = event,
             keyboardController = keyboardController,
             context = context,
-            onAuthError
+            onAuthError = onAuthError,
+            onReviewsClicked = onReviewsClicked
         )
     }
 
@@ -97,6 +101,7 @@ fun ViewRecipeScreenRoot(
                 ViewRecipeAction.OnBookmarkClicked -> Unit
                 ViewRecipeAction.OnBackPress -> onBackPress()
                 is ViewRecipeAction.OnAuthorClicked -> onAuthorClick(action.authorId)
+                ViewRecipeAction.OnReviewsClicked -> Unit
             }
             viewModel.onAction(action)
         }
@@ -107,7 +112,8 @@ private fun eventHandler(
     event: ViewRecipeEvent,
     keyboardController: SoftwareKeyboardController?,
     context: Context,
-    onAuthError: () -> Unit
+    onAuthError: () -> Unit,
+    onReviewsClicked: (String) -> Unit
 ) {
     when (event) {
         is ViewRecipeEvent.ViewRecipeError -> {
@@ -120,6 +126,7 @@ private fun eventHandler(
         }
 
         ViewRecipeEvent.AuthError -> {onAuthError()}
+        is ViewRecipeEvent.OnReviewsClicked -> onReviewsClicked(event.recipeId)
     }
 }
 
@@ -233,6 +240,14 @@ private fun RecipeSheetScaffold(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = recipe.description, style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height(16.dp))
+                ListItem(
+                    headlineContent = { Text(text = stringResource(id = R.string.reviews)) },
+                    trailingContent = { Icon(imageVector = ArrowRightIcon, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        onAction(ViewRecipeAction.OnReviewsClicked)
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(text = "Tags", style = MaterialTheme.typography.titleMedium)
                 TagGrid(tags = recipe.tags, modifier = Modifier.fillMaxWidth())
                 Spacer(modifier = Modifier.height(16.dp))
@@ -260,7 +275,8 @@ private fun RecipeSheetScaffold(
     ) {
         Column(Modifier.fillMaxSize()) {
             Box(modifier = Modifier
-                .fillMaxSize().weight(1f)
+                .fillMaxSize()
+                .weight(1f)
             ) {
                 AsyncImage(
                     model = recipe.imgUrl,
@@ -303,7 +319,7 @@ fun PreparationSteps(
             ) {
                 Text(
                     text = "${i + 1}",
-                     style = MaterialTheme.typography.displaySmall
+                    style = MaterialTheme.typography.displaySmall
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
@@ -380,17 +396,21 @@ private fun TagGrid(
     modifier: Modifier = Modifier,
     tags: List<String>
 ) {
-    FlowRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        tags.forEach{tag ->
-            SuggestionChip(
-                onClick = { /*TODO*/ },
-                label = {
-                    Text(text = tag)
-                }
-            )
+    if (tags.isEmpty())
+        Text(text = "-")
+    else {
+        FlowRow(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            tags.forEach{tag ->
+                SuggestionChip(
+                    onClick = { /*TODO*/ },
+                    label = {
+                        Text(text = tag)
+                    }
+                )
+            }
         }
     }
 }

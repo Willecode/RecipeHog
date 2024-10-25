@@ -190,6 +190,15 @@ class ViewRecipeViewModel(
             ViewRecipeAction.OnLikeClicked -> onLikeClick()
             ViewRecipeAction.OnBookmarkClicked -> onBookmarkClick()
             is ViewRecipeAction.OnAuthorClicked -> Unit
+            ViewRecipeAction.OnReviewsClicked -> onReviewsClicked()
+        }
+    }
+
+    private fun onReviewsClicked() {
+        viewModelScope.launch {
+            _eventChannel.send(ViewRecipeEvent.OnReviewsClicked(
+                recipeId = savedStateHandle.get<String>("recipeId")!!
+            ))
         }
     }
 }

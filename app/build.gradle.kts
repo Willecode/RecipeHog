@@ -80,6 +80,8 @@ dependencies {
     implementation(projects.recipe.data)
     implementation(projects.discover.presentation)
     implementation(projects.discover.data)
+    implementation(projects.review.presentation)
+    implementation(projects.review.data)
     implementation(projects.bookmarks.presentation)
     implementation(projects.profile.presentation)
     implementation(projects.core.presentation.designsystem)
