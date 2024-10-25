@@ -95,3 +95,11 @@ val DeleteIcon: ImageVector
 val DotMenuIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.outline_more_vert_24)
+
+val ArrowRightIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_arrow_right_24)
+
+val EditIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.outline_edit_24)

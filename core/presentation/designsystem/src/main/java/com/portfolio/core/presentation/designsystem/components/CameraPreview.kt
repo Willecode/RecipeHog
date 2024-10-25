@@ -73,7 +73,7 @@ fun CameraPreview(
         cameraProvider.bindToLifecycle(lifecycleOwner, cameraxSelector, preview, imageCapture)
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
-    AndroidView({ previewView })
+    AndroidView(factory = { previewView }, modifier = modifier.fillMaxSize())
     Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
         Button(
             onClick = {

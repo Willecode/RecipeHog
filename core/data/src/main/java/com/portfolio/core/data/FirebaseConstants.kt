@@ -10,6 +10,7 @@ object FirebaseConstants {
     const val USER_DISPLAY_NAME_FIELD = "displayName"
     const val USER_LIKES_FIELD = "likes"
     const val USER_PROFILE_PIC_URL_FIELD = "profilePictureUrl"
+    const val USER_POSTED_RECIPES_FIELD = "postedRecipes"
     const val USER_PRIVATE_DATA_LIKED_RECIPES_CONTENT_FIELD = "content"
     const val USER_PRIVATE_DATA_BOOKMARKED_RECIPES_CONTENT_FIELD = "content"
 

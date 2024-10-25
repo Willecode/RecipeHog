@@ -8,8 +8,10 @@ import com.portfolio.core.data.data_source.ReactiveUserDataSource
 import com.portfolio.core.data.data_source.UserDataSource
 import com.portfolio.core.data.repository.OfflineFirstFirebaseUserDataRepository
 import com.portfolio.core.data.repository.OfflineFirstReactiveUserDataRepository
+import com.portfolio.core.data.util.FirebaseStorageUploader
 import com.portfolio.core.domain.model.ReactiveUserDataRepository
 import com.portfolio.core.domain.model.UserDataRepository
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -29,4 +31,5 @@ val coreDataModule = module {
     singleOf(::OfflineFirstFirebaseUserDataRepository).bind<UserDataRepository>()
     singleOf(::FirebaseReactiveUserDataSource).bind<ReactiveUserDataSource>()
     singleOf(::OfflineFirstReactiveUserDataRepository).bind<ReactiveUserDataRepository>()
+    factoryOf(::FirebaseStorageUploader)
 }

@@ -9,9 +9,11 @@ import com.portfolio.core.data.FirebaseConstants.USER_BOOKMARKED_RECIPES_DOCUMEN
 import com.portfolio.core.data.FirebaseConstants.USER_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.USER_LIKED_RECIPES_DOCUMENT
 import com.portfolio.core.data.FirebaseConstants.USER_PRIVATE_DATA_COLLECTION
+import com.portfolio.core.data.FirebaseConstants.USER_PROFILE_PIC_URL_FIELD
 import com.portfolio.core.data.data_source.util.PublicUserDataSerializable
 import com.portfolio.core.data.data_source.util.toPrivateUserData
 import com.portfolio.core.data.data_source.util.toPublicUserData
+import com.portfolio.core.data.util.FirebaseStorageUploader
 import com.portfolio.core.data.util.RecipePreviewSerializable
 import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.data.util.toRecipePreview
@@ -29,14 +31,17 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class FirebaseReactiveUserDataSource(
     private val userDataSource: UserDataSource,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val firebaseStorageUploader: FirebaseStorageUploader
 ): ReactiveUserDataSource {
 
     /**
      * Adds a listener to the cache for user data changes and emits it to a flow
+     * TODO: Remove UserDataSource class, implement the methods here.
      */
     override fun getUserData(userId: String): Flow<UserData> {
         val publicDataRef = firestore
@@ -221,8 +226,45 @@ class FirebaseReactiveUserDataSource(
         }
     }
 
+    /**
+     * Todo: Delete old profile image from storage
+     */
+    override suspend fun changeProfilePicture(
+        userId: String,
+        filePath: String
+    ): EmptyResult<DataError.Network> {
+        return firestoreSafeCallServer {
+            val storageUploadPath = generateStorageUploadPath()
+            val imgUrl = firebaseStorageUploader.tryUploadImage(filePath, storageUploadPath)
+            try {
+                firestore
+                    .collection(USER_COLLECTION)
+                    .document(userId)
+                    .update(
+                        /* field = */ USER_PROFILE_PIC_URL_FIELD,
+                        /* value = */ imgUrl
+                    ).await()
+            } catch (e: FirebaseFirestoreException) {
+                firebaseStorageUploader.scheduleUploadedFileDeletion()
+                throw e
+            }
+
+            return Result.Success(Unit).asEmptyDataResult()
+        }
+    }
+
     data class RecipePreviewListSerializable(
         val content: Map<String ,RecipePreviewSerializable> = mapOf()
     )
 
+    /**
+     * Returns the path that the file will have in the remote database
+     */
+    private fun generateStorageUploadPath() = "$PROFILE_IMAGES_FOLDER/${generateRandomId()}.jpg)"
+
+    private fun generateRandomId() = UUID.randomUUID().toString()
+
+    companion object {
+        const val PROFILE_IMAGES_FOLDER = "profile_images"
+    }
 }

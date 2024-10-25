@@ -1,14 +1,14 @@
 package com.portfolio.recipe.data.data_source
 
-import android.net.Uri
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Source
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
 import com.portfolio.core.data.FirebaseConstants.RECIPES_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.RECIPE_PREVIEWS_COLLECTION
+import com.portfolio.core.data.FirebaseConstants.USER_COLLECTION
+import com.portfolio.core.data.FirebaseConstants.USER_POSTED_RECIPES_FIELD
+import com.portfolio.core.data.util.FirebaseStorageUploader
 import com.portfolio.core.data.util.firestoreSafeCallCache
 import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.domain.model.IngredientListing
@@ -17,18 +17,15 @@ import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
 import com.portfolio.core.domain.util.Result
 import com.portfolio.core.domain.util.asEmptyDataResult
-import com.portfolio.recipe.data.data_source.work.DeleteStorageFileScheduler
 import com.portfolio.recipe.domain.RecipeDraft
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withTimeout
-import java.io.File
 import java.util.UUID
 
 class FirebaseRecipeDataSource(
     private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage,
-    private val deleteStorageFileScheduler: DeleteStorageFileScheduler
+    private val firebaseStorageUploader: FirebaseStorageUploader
+//    private val storage: FirebaseStorage,
+//    private val deleteStorageFileScheduler: DeleteStorageFileScheduler
 ): RecipeDataSource {
     override suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError> {
         return firestoreSafeCallCache {
@@ -42,6 +39,10 @@ class FirebaseRecipeDataSource(
         }
     }
 
+    /**
+     * This function suffers significantly from the lack of cloud functions in the backend.
+     * Without CF it has to post the recipe to many collections instead of just one, and is error prone.
+     */
     override suspend fun postRecipe(
         recipeDraft: RecipeDraft,
         imageFilePath: String,
@@ -50,11 +51,11 @@ class FirebaseRecipeDataSource(
     ): EmptyResult<DataError.Network> {
         return firestoreSafeCallServer {
             val storageUploadPath = generateStorageUploadPath()
-            val imgUrl = tryUploadImage(imageFilePath, storageUploadPath)
+            val imgUrl = firebaseStorageUploader.tryUploadImage(imageFilePath, storageUploadPath)
             try {
                 uploadRecipeAndPreview(recipeDraft, imgUrl, userId, username)
             } catch (e: FirebaseFirestoreException) {
-                deleteStorageFileScheduler.scheduleFileDeletion(storageUploadPath)
+                firebaseStorageUploader.scheduleUploadedFileDeletion()
                 throw e
             }
 
@@ -73,14 +74,17 @@ class FirebaseRecipeDataSource(
         // Cloud functions not available, so need to manually upload the preview version.
         val recipeId = docRef.id
         try {
+            val recipePreviewUploadable = recipeDraft.toRecipePreviewUploadable(
+                imgUrl = imgUrl,
+                authorId = userId,
+                author = username
+            )
+
             uploadRecipePreview(
                 recipeId = recipeId,
-                recipePreviewUploadable = recipeDraft.toRecipePreviewUploadable(
-                    imgUrl = imgUrl,
-                    authorId = userId,
-                    author = username
-                )
+                recipePreviewUploadable = recipePreviewUploadable
             )
+
         } catch (e: FirebaseFirestoreException) {
             // If preview upload failed, delete the recipe.
             firestore.collection(RECIPES_COLLECTION).document(recipeId)
@@ -103,64 +107,35 @@ class FirebaseRecipeDataSource(
         recipeId: String,
         recipePreviewUploadable: RecipePreviewUploadable
     ) {
+        // Upload to RECIPE_PREVIEWS_COLLECTION
         firestore
             .collection(RECIPE_PREVIEWS_COLLECTION)
             .document(recipeId)
             .set(
                 recipePreviewUploadable
             ).await()
-    }
 
-    private suspend fun FirebaseRecipeDataSource.tryUploadImage(
-        localImageFilePath: String,
-        storageUploadPath: String
-    ) = try {
-        uploadImageFile(localImageFilePath, storageUploadPath)
-    } catch (e: StorageException) {
-        // throw an exception that the generic safecall can handle
-        throw FirebaseFirestoreException(
-            "Failed to upload image",
-            FirebaseFirestoreException.Code.UNKNOWN
-        )
-    } catch (e: TimeoutCancellationException) {
-        throw FirebaseFirestoreException(
-            "Failed to upload image",
-            FirebaseFirestoreException.Code.UNKNOWN
-        )
+        // Upload to USER_COLLECTION.USER_POSTED_RECIPES_FIELD
+        try {
+            firestore
+                .collection(USER_COLLECTION)
+                .document(recipePreviewUploadable.authorUserId)
+                .update(
+                    /* field = */ "${USER_POSTED_RECIPES_FIELD}.${recipeId}",
+                    /* value = */ recipePreviewUploadable
+                ).await()
+        } catch (e: FirebaseFirestoreException) {
+            // If preview upload failed, delete the recipe.
+            firestore.collection(RECIPE_PREVIEWS_COLLECTION).document(recipeId)
+                .delete().await()
+            throw e
+        }
     }
 
     /**
      * Returns the path that the file will have in the remote database
      */
     private fun generateStorageUploadPath() = "$RECIPE_IMAGES_FOLDER/${generateRandomId()}.jpg)"
-
-    private suspend fun uploadImageFile(localImageFilePath: String, storageUploadPath: String): String {
-        val file = Uri.fromFile(File(localImageFilePath))
-        val imageRef = storage.reference.child(storageUploadPath)
-
-        try {
-            withTimeout(20_000L) {
-                imageRef.putFile(file).await()
-            }
-        } catch (e: TimeoutCancellationException) {
-            throw e
-        }
-
-        try {
-            val imageUrlSnapshot = withTimeout(20_000L) {
-                imageRef.downloadUrl.await()
-            }
-            val imgUrl = imageUrlSnapshot.toString()
-            return imgUrl
-        } catch (e: StorageException) {
-            // failed to download URL, need to delete the file from the database since nothing can reference it
-            deleteStorageFileScheduler.scheduleFileDeletion(storageUploadPath)
-            throw e
-        } catch (e: TimeoutCancellationException) {
-            deleteStorageFileScheduler.scheduleFileDeletion(storageUploadPath)
-            throw e
-        }
-    }
 
     private fun generateRandomId() = UUID.randomUUID().toString()
 

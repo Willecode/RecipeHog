@@ -1,6 +1,5 @@
 package com.portfolio.recipehog.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -14,6 +13,8 @@ import com.portfolio.auth.presentation.userinfo.UserInfoScreenRoot
 import com.portfolio.bookmarks.presentation.BookmarksScreenRoot
 import com.portfolio.home.presentation.HomeScreenRoot
 import com.portfolio.presentation.DiscoverScreenRoot
+import com.portfolio.profile.presentation.edit_profile.EditProfileScreenRoot
+import com.portfolio.profile.presentation.view_profile.ViewProfileScreenRoot
 import com.portfolio.recipe.presentation.create_recipe.CreateRecipeScreenRoot
 import com.portfolio.recipe.presentation.view_recipe.ViewRecipeScreenRoot
 import com.portfolio.recipehog.MainViewModel
@@ -129,7 +130,13 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
             }
         }
 
-            composable<DestinationHome> {
+        fun navigateToViewUser(userId: String) {
+            navController.navigate(DestinationViewUser(userId = userId)) {
+                launchSingleTop = true
+            }
+        }
+
+        composable<DestinationHome> {
             HogNavigationSuiteScaffold(
                 navController = navController
             ) {
@@ -149,7 +156,8 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
         composable<DestinationViewRecipe> {
             ViewRecipeScreenRoot(
                 onBackPress = { navController.popBackStack() },
-                onAuthError = { logOutUser() }
+                onAuthError = { logOutUser() },
+                onAuthorClick = { authorId -> navigateToViewUser(userId = authorId)}
             )
         }
         composable<DestinationCreateRecipe> {
@@ -185,11 +193,16 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
             }
         }
         composable<DestinationYou> {
-            HogNavigationSuiteScaffold(
-                navController = navController
-            ) {
-                Text(text = "You")
-            }
+            EditProfileScreenRoot(
+                onRecipeClick = { recipeId -> navigateToViewRecipe(recipeId = recipeId) },
+                onAuthError = { logOutUser() }
+            )
+        }
+        composable<DestinationViewUser> {
+            ViewProfileScreenRoot(
+                onRecipeClick = { recipeId -> navigateToViewRecipe(recipeId = recipeId) },
+                onAuthError = { logOutUser() }
+            )
         }
     }
 }

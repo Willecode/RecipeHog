@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="posted_recipes">Posted recipes</string>
+    <string name="recipe_likes">Recipe likes</string>
+    <string name="member_since">Member since</string>
+    <string name="account_settings">Account settings</string>
+    <string name="display_name">Display name</string>
+    <string name="email">Email</string>
+    <string name="theme">Theme</string>
+    <string name="cd_change_profile_picture">Change profile picture</string>
+    <string name="please_grant_camera_permission_in_app_settings">Please grant camera permissions in app settings</string>
+    <string name="couldnt_access_device_camera">Couldn\'t access device camera</string>
+    <string name="set_as_profile_image">Set as profile image</string>
+    <string name="couldnt_change_profile_pic">Couldn\'t change profile pic</string>
+</resources>

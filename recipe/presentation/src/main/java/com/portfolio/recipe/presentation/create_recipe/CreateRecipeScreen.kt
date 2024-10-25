@@ -73,7 +73,7 @@ import com.portfolio.core.presentation.designsystem.GalleryIcon
 import com.portfolio.core.presentation.designsystem.PersonIcon
 import com.portfolio.core.presentation.designsystem.RecipeHogTheme
 import com.portfolio.core.presentation.designsystem.components.CameraPreview
-import com.portfolio.core.presentation.designsystem.components.HogDialog
+import com.portfolio.core.presentation.designsystem.components.HogCameraPermissionRationaleDialog
 import com.portfolio.core.presentation.ui.ObserveAsEvents
 import com.portfolio.recipe.presentation.R
 import com.portfolio.recipe.presentation.create_recipe.ingredient.IngredientUI
@@ -313,23 +313,16 @@ private fun CreateRecipeForm(
         }
     }
     if (state.showCameraPermissionRationale) {
-        HogDialog(
-            title = stringResource(id = R.string.camera_permission_required),
-            onDismiss = { /* Can't dismiss */ },
-            description = stringResource(id = R.string.camera_permission_rationale),
-            primaryButton = {
-                Button(
-                    onClick = { onAction(CreateRecipeAction.OnRequestCameraPermission) }) {
-                    Text(text = stringResource(id = R.string.grant_permission))
-                }
+        HogCameraPermissionRationaleDialog(
+            onGrantPermission = {
+                onAction(CreateRecipeAction.OnRequestCameraPermission)
             },
-            secondaryButton = {
-                Button(
-                    onClick = { onAction(CreateRecipeAction.OnShowCameraPermRationaleChanged(
+            onDontGrantPermission = {
+                onAction(
+                    CreateRecipeAction.OnShowCameraPermRationaleChanged(
                         showCameraRationale = false
-                    )) }) {
-                    Text(text = stringResource(id = R.string.dont_grant))
-                }
+                    )
+                )
             }
         )
     }

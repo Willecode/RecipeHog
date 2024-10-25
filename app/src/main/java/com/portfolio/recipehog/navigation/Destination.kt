@@ -31,3 +31,7 @@ object DestinationCreateRecipe
 object DestinationBookmarks
 @Serializable
 object DestinationYou
+@Serializable
+data class DestinationViewUser(
+    val userId: String
+)

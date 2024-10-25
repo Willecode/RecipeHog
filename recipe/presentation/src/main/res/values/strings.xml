@@ -28,12 +28,8 @@
     <string name="item">Item</string>
     <string name="cd_add_ingredient">Add ingredient</string>
     <string name="step">Step</string>
-    <string name="camera_permission_required">Camera permission required</string>
-    <string name="camera_permission_rationale">RecipeHog needs camera permissions for capturing profile and recipe pictures</string>
-    <string name="grant_permission">Grant permission</string>
     <string name="cd_delete_ingredient">Delete ingredient</string>
     <string name="cd_delete_preparation_step">Delete preparation step</string>
-    <string name="dont_grant">Don\'t grant</string>
     <string name="please_grant_camera_permission_in_app_settings">Please grant camera permission in the app settings</string>
     <string name="servings">Servings</string>
     <string name="couldnt_access_device_camera">Couldn\'t access device camera</string>

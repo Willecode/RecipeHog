@@ -1,7 +1,9 @@
 package com.portfolio.core.data.data_source.util
 
+import com.portfolio.core.data.util.RecipePreviewSerializable
+import com.portfolio.core.data.util.toRecipePreview
 import com.portfolio.core.domain.model.PublicUserData
-import com.portfolio.core.domain.model.RecipePreview
+import java.time.ZoneId
 import java.util.Date
 
 data class PublicUserDataSerializable(
@@ -9,14 +11,22 @@ data class PublicUserDataSerializable(
     val creationDate: Date = Date(),
     val likes: Int = 0,
     val profilePictureUrl: String = "",
-    val postedRecipes: Map<String, RecipePreview> = mapOf()
+    val postedRecipes: Map<String, RecipePreviewSerializable> = mapOf()
 )
 fun PublicUserDataSerializable.toPublicUserData(): PublicUserData {
     return PublicUserData(
         displayName = displayName,
-        creationDate = creationDate,
+        creationDate = creationDate
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+        ,
         likes = likes,
         profilePictureUrl = profilePictureUrl,
-        postedRecipes = postedRecipes
+        postedRecipes = postedRecipes.toList().map {
+            var preview = it.second.toRecipePreview()
+            preview = preview.copy(recipeId = it.first)
+            preview
+        }
     )
 }

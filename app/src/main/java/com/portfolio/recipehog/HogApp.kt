@@ -9,6 +9,7 @@ import com.portfolio.data.di.discoverDataModule
 import com.portfolio.home.data.di.homeDataModule
 import com.portfolio.home.presentation.di.homeViewModelModule
 import com.portfolio.presentation.di.discoverViewModelModule
+import com.portfolio.profile.presentation.di.profilePresentationModule
 import com.portfolio.recipe.data.di.recipeDataModule
 import com.portfolio.recipe.presentation.di.recipePresentationModule
 import com.portfolio.recipehog.di.mainModule
@@ -41,7 +42,8 @@ class HogApp: Application() {
                 coreDataModule,
                 discoverDataModule,
                 discoverViewModelModule,
-                bookmarksPresentationModule
+                bookmarksPresentationModule,
+                profilePresentationModule
             )
         }
     }

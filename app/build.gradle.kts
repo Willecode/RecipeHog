@@ -81,6 +81,7 @@ dependencies {
     implementation(projects.discover.presentation)
     implementation(projects.discover.data)
     implementation(projects.bookmarks.presentation)
+    implementation(projects.profile.presentation)
     implementation(projects.core.presentation.designsystem)
     implementation(projects.core.domain)
     implementation(projects.core.data)

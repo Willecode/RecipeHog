@@ -68,4 +68,9 @@ class OfflineFirstReactiveUserDataRepository(
         val uid = sessionStorage.get()?.userId ?: return Result.Error(DataError.Network.UNAUTHORIZED)
         return reactiveUserDataSource.fetchBookmarksAndLikes(uid)
     }
+
+    override suspend fun changeProfilePicture(filePath: String): EmptyResult<DataError.Network> {
+        val uid = sessionStorage.get()?.userId ?: return Result.Error(DataError.Network.UNAUTHORIZED)
+        return reactiveUserDataSource.changeProfilePicture(userId = uid, filePath = filePath)
+    }
 }

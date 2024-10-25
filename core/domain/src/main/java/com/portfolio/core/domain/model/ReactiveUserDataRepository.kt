@@ -19,4 +19,6 @@ interface ReactiveUserDataRepository {
     fun getBookmarkedRecipes(): Flow<List<RecipePreview>>
     fun getLikedRecipes(): Flow<List<RecipePreview>>
     suspend fun fetchBookmarksAndLikes(): EmptyResult<DataError.Network>
+
+    suspend fun changeProfilePicture(filePath: String): EmptyResult<DataError.Network>
 }

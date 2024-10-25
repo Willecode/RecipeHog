@@ -1,12 +1,12 @@
 package com.portfolio.core.domain.model
 
-import java.util.Date
+import java.time.LocalDate
 
 
 data class PublicUserData(
     val displayName: String,
-    val creationDate: Date,
+    val creationDate: LocalDate,
     val likes: Int,
     val profilePictureUrl: String,
-    val postedRecipes: Map<String, RecipePreview>
+    val postedRecipes: List<RecipePreview>
 )

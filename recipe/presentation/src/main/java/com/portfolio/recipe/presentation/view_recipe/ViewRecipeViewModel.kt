@@ -189,6 +189,7 @@ class ViewRecipeViewModel(
             ViewRecipeAction.OnBackPress -> Unit
             ViewRecipeAction.OnLikeClicked -> onLikeClick()
             ViewRecipeAction.OnBookmarkClicked -> onBookmarkClick()
+            is ViewRecipeAction.OnAuthorClicked -> Unit
         }
     }
 }

@@ -5,6 +5,7 @@ package com.portfolio.recipe.presentation.view_recipe
 import android.content.Context
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,6 +75,7 @@ import org.koin.androidx.compose.koinViewModel
 fun ViewRecipeScreenRoot(
     viewModel: ViewRecipeViewModel = koinViewModel(),
     onBackPress: () -> Unit,
+    onAuthorClick: (String) -> Unit,
     onAuthError: () -> Unit
 ) {
     val context = LocalContext.current
@@ -94,6 +96,7 @@ fun ViewRecipeScreenRoot(
                 ViewRecipeAction.OnLikeClicked -> Unit
                 ViewRecipeAction.OnBookmarkClicked -> Unit
                 ViewRecipeAction.OnBackPress -> onBackPress()
+                is ViewRecipeAction.OnAuthorClicked -> onAuthorClick(action.authorId)
             }
             viewModel.onAction(action)
         }
@@ -185,7 +188,10 @@ private fun RecipeSheetScaffold(
                         )
                         Text(
                             text = "by ${recipe.author}",
-                            style = MaterialTheme.typography.titleSmall
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.clickable {
+                                onAction(ViewRecipeAction.OnAuthorClicked(recipe.authorUserId))
+                            }
                         )
                         Row(
                             modifier = Modifier.padding(top = 4.dp)

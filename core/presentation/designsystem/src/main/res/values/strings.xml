@@ -6,4 +6,8 @@
     <string name="cd_search_icon">Search</string>
     <string name="search_any_recipes">Search any recipes</string>
     <string name="navigate_back">Navigate back</string>
+    <string name="camera_permission_required">Camera permission required</string>
+    <string name="camera_permission_rationale">RecipeHog needs camera permissions for capturing profile and recipe pictures</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="dont_grant">Don\'t grant</string>
 </resources>
