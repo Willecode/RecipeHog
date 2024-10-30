@@ -143,6 +143,12 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
             }
         }
 
+        fun navigateToDiscovery() {
+            navController.navigate(DestinationDiscover) {
+                launchSingleTop = true
+            }
+        }
+
         composable<DestinationHome> {
             HogNavigationSuiteScaffold(
                 navController = navController
@@ -156,6 +162,9 @@ fun NavGraphBuilder.contentGraph(navController: NavHostController, viewModel: Ma
                     },
                     onAuthError = {
                         logOutUser()
+                    },
+                    onSearchClick = {
+                        navigateToDiscovery()
                     }
                 )
             }

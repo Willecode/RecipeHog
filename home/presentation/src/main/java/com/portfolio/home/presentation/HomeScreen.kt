@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
@@ -51,7 +54,8 @@ fun HomeScreenRoot(
     viewModel: HomeViewModel = org.koin.androidx.compose.koinViewModel(),
     onRecipeClick: (String) -> Unit,
     onLogoutClick: () -> Unit,
-    onAuthError: () -> Unit
+    onAuthError: () -> Unit,
+    onSearchClick: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -75,7 +79,7 @@ fun HomeScreenRoot(
                     is HomeAction.OnRecipeClick -> {
                         onRecipeClick(action.recipeId)
                     }
-                    HomeAction.OnSearchClick -> Unit
+                    HomeAction.OnSearchClick -> onSearchClick()
                     HomeAction.OnLogoutClick -> onLogoutClick()
                 }
                 viewModel.onAction(action)
@@ -88,7 +92,7 @@ private fun eventHandler(
     event: HomeEvent,
     keyboardController: SoftwareKeyboardController?,
     context: Context,
-    onAuthError: () -> Unit
+    onAuthError: () -> Unit,
 ) {
     when (event) {
         is HomeEvent.HomeError -> {
@@ -116,8 +120,10 @@ private fun HomeScreen(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 8.dp),
     ) {
         Spacer(modifier = Modifier.height(32.dp))
         Row(
