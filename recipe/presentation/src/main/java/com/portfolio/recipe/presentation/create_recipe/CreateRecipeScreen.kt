@@ -223,7 +223,6 @@ private fun CreateRecipeForm(
                 picture = state.picture
             )
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(
                 text = stringResource(id = R.string.title),
                 style = MaterialTheme.typography.titleMedium
@@ -240,7 +239,6 @@ private fun CreateRecipeForm(
                     }
                 }
             )
-
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(id = R.string.description),
@@ -257,7 +255,6 @@ private fun CreateRecipeForm(
                     }
                 }
             )
-
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(id = R.string.duration),
@@ -298,7 +295,8 @@ private fun CreateRecipeForm(
             Text(text = "Preparation", style = MaterialTheme.typography.titleMedium)
             PreparationDrafts(state, onAction)
             Spacer(modifier = Modifier.height(8.dp))
-            //Text(text = "Tags", style = MaterialTheme.typography.titleMedium)
+            Text(text = stringResource(id = R.string.tags), style = MaterialTheme.typography.titleMedium)
+            Tags(state = state, onAction = onAction)
             val context = LocalContext.current
             if (state.posting) {
                 CircularProgressIndicator()
@@ -309,7 +307,6 @@ private fun CreateRecipeForm(
                     Text(text = stringResource(id = R.string.post))
                 }
             }
-
         }
     }
     if (state.showCameraPermissionRationale) {
@@ -699,6 +696,53 @@ private fun ImageChooser(
         }
 
     }
+}
+
+@Composable
+private fun Tags(
+    state: CreateRecipeState,
+    onAction: (CreateRecipeAction) -> Unit
+) {
+    state.tags.forEachIndexed { index, tag ->
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = tag.text,
+                onValueChange = {
+                    onAction(
+                        CreateRecipeAction.OnTagChanged(
+                            tagIndex = index,
+                            value = it
+                        )
+                    )
+                },
+                modifier = Modifier.weight(1f),
+                label = {
+                    Text(
+                        text = "${stringResource(id = R.string.tag)} ${index + 1}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1
+                    )
+                },
+                isError = tag.showError,
+                supportingText = {
+                    if (tag.showError){
+                        Text(text = stringResource(id = R.string.cant_be_empty))
+                    }
+                }
+            )
+            IconButton(
+                onClick = { onAction(CreateRecipeAction.OnDeleteTag(index)) },
+            ) {
+                Icon(
+                    imageVector = DeleteIcon,
+                    contentDescription = stringResource(id = R.string.cd_delete_tag)
+                )
+            }
+        }
+    }
+    AddListingButton { onAction(CreateRecipeAction.OnAddTag) }
 }
 
 private fun ManagedActivityResultLauncher<String, Boolean>.requestCameraPermissions(

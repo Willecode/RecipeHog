@@ -42,4 +42,8 @@
     <string name="please_add_a_picture">Please add a picture</string>
     <string name="recipe_posted">Recipe posted!</string>
     <string name="reviews">Reviews</string>
+    <string name="tags">Tags</string>
+    <string name="tag">Tag</string>
+    <string name="cd_delete_tag">Delete tag</string>
+    <string name="reached_max_tag_count">Reached max tag count</string>
 </resources>

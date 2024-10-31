@@ -245,7 +245,7 @@ class FirebaseReactiveUserDataSource(
                         /* value = */ imgUrl
                     ).await()
             } catch (e: FirebaseFirestoreException) {
-                firebaseStorageUploader.scheduleUploadedFileDeletion()
+                firebaseStorageUploader.scheduleUploadedFileDeletion(storageUploadPath)
                 throw e
             }
 

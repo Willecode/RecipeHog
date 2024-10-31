@@ -21,6 +21,7 @@ import com.portfolio.recipe.presentation.create_recipe.ingredient.IngredientUI
 import com.portfolio.recipe.presentation.create_recipe.ingredient.IngredientUnit
 import com.portfolio.recipe.presentation.create_recipe.ingredient.util.asString
 import com.portfolio.recipe.presentation.create_recipe.preparation.PreparationStep
+import com.portfolio.recipe.presentation.create_recipe.tag.TagDraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -49,50 +50,126 @@ class CreateRecipeViewModel(
         const val DESCRIPTION_MAX_CHARS = 100
         const val DURATION_MAX_CHARS = 4
         const val SERVINGS_MAX_CHARS = 4
+        const val TAG_MAX_CHARS = 15
         const val INGREDIENT_NAME_MAX_CHARS = 50
         const val INGREDIENT_QUANTITY_MAX_CHARS = 5
         const val PREPARATION_STEP_MAX_CHARS = 100
         const val MAX_INGREDIENTS = 30
         const val MAX_PREPARATION_STEPS = 30
+        const val MAX_TAGS = 5
     }
 
     fun onAction(action: CreateRecipeAction) {
         when(action) {
-            CreateRecipeAction.OnAddEmptyIngredient -> onAddEmptyIngredient()
-            CreateRecipeAction.OnAddPreparationStep -> onAddPreparationStep()
-            CreateRecipeAction.DismissRationaleDialog -> state = state.copy(showCameraPermissionRationale = false)
-            is CreateRecipeAction.OnDescriptionChanged -> onDescriptionChanged(newDesc = action.newDesc)
-            is CreateRecipeAction.OnTitleChanged -> onTitleChanged(newTitle = action.newTitle)
-            is CreateRecipeAction.OnDurationChanged -> onDurationChanged(newDuration = action.newDuration)
-            is CreateRecipeAction.OnIngredientUnitChanged -> onIngredientUnitChanged(
-                ingredientIndex = action.ingredientIndex,
-                unit = action.unit
-            )
-            is CreateRecipeAction.OnIngredientItemChanged -> onIngredientItemChanged(
-                ingredientIndex = action.ingredientIndex,
-                item = action.item
-            )
-            is CreateRecipeAction.OnIngredientQuantityChanged -> onIngredientQuantityChanged(
-                ingredientIndex = action.ingredientIndex,
-                quantity = action.quantity
-            )
-            is CreateRecipeAction.OnPreparationStepChanged -> onPreparationStepChanged(
-                stepIndex = action.stepIndex,
-                value = action.value
-            )
-            is CreateRecipeAction.OnCameraPermissionChanged ->
+            CreateRecipeAction.OnAddEmptyIngredient -> {
+                onAddEmptyIngredient()
+            }
+            CreateRecipeAction.OnAddPreparationStep -> {
+                onAddPreparationStep()
+            }
+            CreateRecipeAction.DismissRationaleDialog -> {
+                state = state.copy(showCameraPermissionRationale = false)
+            }
+            is CreateRecipeAction.OnDescriptionChanged -> {
+                onDescriptionChanged(newDesc = action.newDesc)
+            }
+            is CreateRecipeAction.OnTitleChanged -> {
+                onTitleChanged(newTitle = action.newTitle)
+            }
+            is CreateRecipeAction.OnDurationChanged -> {
+                onDurationChanged(newDuration = action.newDuration)
+            }
+            is CreateRecipeAction.OnIngredientUnitChanged -> {
+                onIngredientUnitChanged(
+                    ingredientIndex = action.ingredientIndex,
+                    unit = action.unit
+                )
+            }
+            is CreateRecipeAction.OnIngredientItemChanged -> {
+                onIngredientItemChanged(
+                    ingredientIndex = action.ingredientIndex,
+                    item = action.item
+                )
+            }
+            is CreateRecipeAction.OnIngredientQuantityChanged -> {
+                onIngredientQuantityChanged(
+                    ingredientIndex = action.ingredientIndex,
+                    quantity = action.quantity
+                )
+            }
+            is CreateRecipeAction.OnPreparationStepChanged -> {
+                onPreparationStepChanged(
+                    stepIndex = action.stepIndex,
+                    value = action.value
+                )
+            }
+            is CreateRecipeAction.OnCameraPermissionChanged -> {
                 onCameraPermissionChanged(action.hasCameraPermission)
-            is CreateRecipeAction.OnShowCameraPermRationaleChanged ->
+            }
+            is CreateRecipeAction.OnShowCameraPermRationaleChanged -> {
                 state = state.copy(showCameraPermissionRationale = action.showCameraRationale)
-            is CreateRecipeAction.OnCameraError -> onCameraError()
-            is CreateRecipeAction.OnPictureTaken -> onPictureTaken(action.picture)
-            is CreateRecipeAction.OnDeleteIngredient ->
+            }
+            is CreateRecipeAction.OnCameraError -> {
+                onCameraError()
+            }
+            is CreateRecipeAction.OnPictureTaken -> {
+                onPictureTaken(action.picture)
+            }
+            is CreateRecipeAction.OnDeleteIngredient -> {
                 onDeleteIngredient(ingredientIndex = action.ingredientIndex)
-            is CreateRecipeAction.OnDeletePreparationStep ->
+            }
+            is CreateRecipeAction.OnDeletePreparationStep -> {
                 onDeletePreparationStep(stepIndex = action.stepIndex)
-            is CreateRecipeAction.OnServingsChanged -> onServingsChanged(action.newServings)
-            is CreateRecipeAction.OnPostClick -> postRecipe(action.filesDirectory)
-            else -> Unit
+            }
+            is CreateRecipeAction.OnServingsChanged -> {
+                onServingsChanged(action.newServings)
+            }
+            is CreateRecipeAction.OnPostClick -> {
+                postRecipe(action.filesDirectory)
+            }
+            is CreateRecipeAction.OnAddTag -> {
+                onAddTag()
+            }
+            is CreateRecipeAction.OnDeleteTag -> {
+                onDeleteTag(tagIndex = action.tagIndex)
+            }
+            is CreateRecipeAction.OnTagChanged -> {
+                onTagChanged(tagIndex = action.tagIndex, value = action.value)
+            }
+            else -> {
+                Unit
+            }
+        }
+    }
+
+    private fun onTagChanged(tagIndex: Int, value: String) {
+        val newTag = value.take(TAG_MAX_CHARS)
+        updateTag(tagIndex, newTag)
+    }
+
+    private fun updateTag(tagIndex: Int, newTag: String) {
+        val newTags = state.tags.toMutableList()
+        newTags[tagIndex] = TagDraft(text = newTag, showError = false)
+        state = state.copy(tags = newTags)
+    }
+
+    private fun onDeleteTag(tagIndex: Int) {
+        val tags = state.tags.toMutableList()
+        tags.removeAt(tagIndex)
+        state = state.copy(tags = tags)
+    }
+
+    private fun onAddTag() {
+        if (MAX_TAGS <= state.tags.size) {
+            viewModelScope.launch {
+                _eventChannel.send(CreateRecipeEvent.Error(UiText.StringResource(R.string.reached_max_tag_count)))
+                return@launch
+            }
+        } else {
+            val newTags = state.tags.toMutableList().apply {
+                add(TagDraft(text = "", showError = false))
+            }
+            state = state.copy(tags = newTags)
         }
     }
 
@@ -183,7 +260,8 @@ class CreateRecipeViewModel(
                 }
             }
         },
-        preparationSteps = state.preparationSteps.map { it.text }
+        preparationSteps = state.preparationSteps.map { it.text },
+        tags = state.tags.map { it.text }
     )
 
     // TODO: Optimization: This assigns a new value to state multiple times with "state = state.copy(...), could be done with a single assignment
@@ -194,10 +272,28 @@ class CreateRecipeViewModel(
         val servingsValid = validateServings()
         val ingredientsValid = validateIngredientDrafts()
         val preparationValid = validatePreparationSteps()
+        val tagsValid = validateTags()
 
         return (
-            titleValid && descValid && durationValid && servingsValid && ingredientsValid && preparationValid
+            titleValid && descValid && durationValid && servingsValid && ingredientsValid && preparationValid && tagsValid
         )
+    }
+
+    private fun validateTags(): Boolean {
+        var valid = true
+        val tags = state.tags.map { tag ->
+            val tagValid = tag.text.isNotBlank()
+            if (!tagValid)
+                valid = false
+            TagDraft(
+                text = tag.text,
+                showError = !tagValid
+            )
+        }
+
+        state = state.copy(tags = tags)
+
+        return valid
     }
 
     private fun validatePreparationSteps(): Boolean {

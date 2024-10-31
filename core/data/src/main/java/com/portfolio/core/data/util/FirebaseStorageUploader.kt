@@ -14,7 +14,6 @@ class FirebaseStorageUploader(
     private val storage: FirebaseStorage,
     private val deleteStorageFileScheduler: DeleteStorageFileScheduler
 ) {
-    private var storagePath: String? = null
 
     /**
      * @return URL to the uploaded file
@@ -24,13 +23,10 @@ class FirebaseStorageUploader(
         localImageFilePath: String,
         storageUploadPath: String
     ) = try {
-        if (storagePath != null)
-            throw FirebaseFirestoreException(
-                "Uploader instance can only upload one image",
-                com.google.firebase.firestore.FirebaseFirestoreException.Code.UNKNOWN
-            )
-        storagePath = storageUploadPath
-        uploadImageFile(localImageFilePath)
+        uploadImageFile(
+            localImageFilePath = localImageFilePath,
+            storageUploadPath = storageUploadPath
+        )
     } catch (e: StorageException) {
         // throw an exception that the generic safecall can handle
         throw FirebaseFirestoreException(
@@ -44,9 +40,9 @@ class FirebaseStorageUploader(
         )
     }
 
-    private suspend fun uploadImageFile(localImageFilePath: String): String {
+    private suspend fun uploadImageFile(localImageFilePath: String, storageUploadPath: String): String {
         val file = Uri.fromFile(File(localImageFilePath))
-        val imageRef = storage.reference.child(storagePath!!)
+        val imageRef = storage.reference.child(storageUploadPath)
 
         try {
             withTimeout(20_000L) {
@@ -64,10 +60,10 @@ class FirebaseStorageUploader(
             return imgUrl
         } catch (e: StorageException) {
             // failed to download URL, need to delete the file from the database since nothing can reference it
-            scheduleUploadedFileDeletion()
+            scheduleUploadedFileDeletion(storageUploadPath)
             throw e
         } catch (e: TimeoutCancellationException) {
-            scheduleUploadedFileDeletion()
+            scheduleUploadedFileDeletion(storageUploadPath)
             throw e
         }
     }
@@ -75,9 +71,7 @@ class FirebaseStorageUploader(
     /**
      * Schedules a deletion request for the uploaded file.
      */
-    suspend fun scheduleUploadedFileDeletion() {
-        storagePath?.let {
-            deleteStorageFileScheduler.scheduleFileDeletion(it)
-        }
+    suspend fun scheduleUploadedFileDeletion(storageUploadPath: String) {
+        deleteStorageFileScheduler.scheduleFileDeletion(storageUploadPath)
     }
 }

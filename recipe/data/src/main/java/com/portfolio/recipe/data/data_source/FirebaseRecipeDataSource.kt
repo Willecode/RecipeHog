@@ -24,8 +24,6 @@ import java.util.UUID
 class FirebaseRecipeDataSource(
     private val firestore: FirebaseFirestore,
     private val firebaseStorageUploader: FirebaseStorageUploader
-//    private val storage: FirebaseStorage,
-//    private val deleteStorageFileScheduler: DeleteStorageFileScheduler
 ): RecipeDataSource {
     override suspend fun getRecipeFromCache(recipeId: String): Result<Recipe, DataError> {
         return firestoreSafeCallCache {
@@ -55,7 +53,7 @@ class FirebaseRecipeDataSource(
             try {
                 uploadRecipeAndPreview(recipeDraft, imgUrl, userId, username)
             } catch (e: FirebaseFirestoreException) {
-                firebaseStorageUploader.scheduleUploadedFileDeletion()
+                firebaseStorageUploader.scheduleUploadedFileDeletion(storageUploadPath)
                 throw e
             }
 
@@ -187,7 +185,8 @@ class FirebaseRecipeDataSource(
             durationMinutes = duration,
             servings = servings,
             instructions = preparationSteps,
-            ingredients = ingredientDrafts
+            ingredients = ingredientDrafts,
+            tags = tags
         )
     }
 

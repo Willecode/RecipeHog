@@ -8,7 +8,8 @@ data class RecipeDraft(
     val duration: Int,
     val servings: Int,
     val ingredientDrafts: List<IngredientListing>,
-    val preparationSteps: List<String>
+    val preparationSteps: List<String>,
+    val tags: List<String>
 )
 
 

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import com.portfolio.recipe.presentation.create_recipe.ingredient.IngredientDraft
 import com.portfolio.recipe.presentation.create_recipe.ingredient.IngredientUI
 import com.portfolio.recipe.presentation.create_recipe.preparation.PreparationStep
+import com.portfolio.recipe.presentation.create_recipe.tag.TagDraft
 
 data class CreateRecipeState(
     val title: String = "",
@@ -25,6 +26,7 @@ data class CreateRecipeState(
             showError = false
         )
     ),
+    val tags: List<TagDraft> = listOf(),
     val picture: Bitmap? = null,
     /**
      * Permissions
