@@ -26,14 +26,17 @@ https://github.com/user-attachments/assets/3203ad3c-0c68-4169-bdf1-509313a58e1d
 - Custom gradle plugins for easy build config management 
 
 ## Architecture
+The project (loosely) follows Clean Architecture for its scalability, reusabililty, testability, and easy decoupling. 
 ### Layering
-The project has three layers, as in Clean Architecture:
+The project has three layers:
 - **Presentation**: Android library that implements the UI.
 - **Domain**: Kotlin library that implements business logic and defines platform-independent interfaces and models. Also contains Use cases, which are commonly used pieces of business logic.
 - **Data**: Android/Kotlin library that handles back-end requests and data caching.
 - The layer dependencies are as follows: **Presentation -> Domain <- Data**, meaning that Presentation and Data depend on Domain.
 
 ### Unidirectional Data Flow (UDF)
+![recipehog_dataflow](https://github.com/user-attachments/assets/e8aebed8-ecb4-42b5-8e8a-04b4b6c35e4e)
+
 State flows like this: **Data -> Domain -> Presentation**
 - State flows from Data layer, through Domain layer, to the Presentation layer, which then uses the state to display info to the user.
 
@@ -41,7 +44,7 @@ Events flow like this: **Presentation -> Domain -> Data**
 - Events are fired in the Presentation layer by calling Domain layer's services. The domain layer may then perform business logic, and call Data layer services.
 
 ### Dependency injection (DI)
-The data flow between the layers is accomplished via DI. The Domain layer defines **interfaces**. The Presentation layer depends on these interfaces, and **calls** their abstract functions. The Data layer also depends on the Domain layer, because it **implements** the Domain layer's interfaces.
+The data flow between the layers is accomplished via [DI](https://developer.android.com/training/dependency-injection). The Domain layer defines **interfaces**. The Presentation layer depends on these interfaces, and **calls** their abstract functions. The Data layer also depends on the Domain layer, because it **implements** the Domain layer's interfaces.
 
 The Presentation layer's class constructors have Domain layer's interfaces as parameters, and in runtime, the objects are constructed with **Data layer's implementations of the interfaces**.
 
@@ -49,6 +52,8 @@ This is why the Data layer depends on the Domain layer and not vice versa. This 
 
 ### Layered, feature-based modules
 There are four types of modules in the project: **feature, core, app, build-logic**.
+
+![recipehog_modules](https://github.com/user-attachments/assets/5b95a81d-6b91-4f96-834f-1727c6bec2a4)
 
 **Feature modules:**
 - The project has a couple of these: **auth, bookmarks, discover, home, profile, recipe, review**.
