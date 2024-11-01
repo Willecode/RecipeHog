@@ -1,4 +1,4 @@
-package com.portfolio.data.data_source
+package com.portfolio.discover.data.data_source
 
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult

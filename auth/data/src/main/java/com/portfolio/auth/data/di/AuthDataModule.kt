@@ -2,6 +2,7 @@ package com.portfolio.auth.data.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.portfolio.auth.data.AndroidEmailValidator
+import com.portfolio.auth.data.BuildConfig
 import com.portfolio.auth.data.FirebaseAuthRepository
 import com.portfolio.auth.data.FirebaseSessionStorage
 import com.portfolio.auth.domain.AuthRepository
@@ -15,7 +16,8 @@ import org.koin.dsl.module
 val authDataModule = module {
     single {
         val auth = FirebaseAuth.getInstance()
-        auth.useEmulator("10.0.2.2", 9099)
+        if(BuildConfig.DEBUG)
+            auth.useEmulator(BuildConfig.EMU_HOST, BuildConfig.EMU_AUTH_PORT)
         auth
     }
     singleOf(::FirebaseAuthRepository).bind<AuthRepository>()

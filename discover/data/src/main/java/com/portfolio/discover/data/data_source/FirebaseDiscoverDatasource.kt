@@ -1,4 +1,4 @@
-package com.portfolio.data.data_source
+package com.portfolio.discover.data.data_source
 
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore

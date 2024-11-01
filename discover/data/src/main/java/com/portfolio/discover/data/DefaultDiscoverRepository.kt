@@ -1,8 +1,8 @@
-package com.portfolio.data
+package com.portfolio.discover.data
 
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
-import com.portfolio.data.data_source.DiscoverDataSource
+import com.portfolio.discover.data.data_source.DiscoverDataSource
 import com.portfolio.domain.DiscoverRepository
 import com.portfolio.domain.PaginatedRecipePreviewList
 import kotlinx.coroutines.flow.Flow

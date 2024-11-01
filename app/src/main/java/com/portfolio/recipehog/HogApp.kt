@@ -5,7 +5,7 @@ import com.portfolio.auth.data.di.authDataModule
 import com.portfolio.auth.presentation.di.authViewModelModule
 import com.portfolio.bookmarks.presentation.di.bookmarksPresentationModule
 import com.portfolio.core.data.di.coreDataModule
-import com.portfolio.data.di.discoverDataModule
+import com.portfolio.discover.data.di.discoverDataModule
 import com.portfolio.home.data.di.homeDataModule
 import com.portfolio.home.presentation.di.homeViewModelModule
 import com.portfolio.presentation.di.discoverViewModelModule

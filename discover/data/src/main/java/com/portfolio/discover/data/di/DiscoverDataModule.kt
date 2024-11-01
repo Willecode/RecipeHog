@@ -1,8 +1,8 @@
-package com.portfolio.data.di
+package com.portfolio.discover.data.di
 
-import com.portfolio.data.DefaultDiscoverRepository
-import com.portfolio.data.data_source.DiscoverDataSource
-import com.portfolio.data.data_source.FirebaseDiscoverDatasource
+import com.portfolio.discover.data.DefaultDiscoverRepository
+import com.portfolio.discover.data.data_source.DiscoverDataSource
+import com.portfolio.discover.data.data_source.FirebaseDiscoverDatasource
 import com.portfolio.domain.DiscoverRepository
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
