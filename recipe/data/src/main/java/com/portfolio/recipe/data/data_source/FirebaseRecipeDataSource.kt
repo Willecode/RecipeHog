@@ -8,15 +8,19 @@ import com.portfolio.core.data.FirebaseConstants.RECIPES_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.RECIPE_PREVIEWS_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.USER_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.USER_POSTED_RECIPES_FIELD
+import com.portfolio.core.data.data_source.model.RecipeSerializable
+import com.portfolio.core.data.data_source.model.toRecipe
 import com.portfolio.core.data.util.FirebaseStorageUploader
 import com.portfolio.core.data.util.firestoreSafeCallCache
 import com.portfolio.core.data.util.firestoreSafeCallServer
-import com.portfolio.core.domain.model.IngredientListing
 import com.portfolio.core.domain.model.Recipe
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
 import com.portfolio.core.domain.util.Result
 import com.portfolio.core.domain.util.asEmptyDataResult
+import com.portfolio.recipe.data.data_source.model.RecipePreviewUploadable
+import com.portfolio.recipe.data.data_source.model.toRecipePreviewUploadable
+import com.portfolio.recipe.data.data_source.model.toRecipeUploadable
 import com.portfolio.recipe.domain.RecipeDraft
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
@@ -147,59 +151,10 @@ class FirebaseRecipeDataSource(
                 throw(FirebaseFirestoreException("Failed to get recipe document", FirebaseFirestoreException.Code.UNKNOWN))
             }
 
-            val recipe = snapshot.toObject(Recipe::class.java)!!
+            val recipe = snapshot.toObject(RecipeSerializable::class.java)!!
 
-            return Result.Success(recipe)
+            return Result.Success(recipe.toRecipe())
     }
-
-    data class RecipeUploadable(
-        val title: String = "",
-        val author: String = "",
-        val authorUserId: String = "",
-        val description: String = "",
-        val imgUrl: String = "",
-        val likeCount: Int = 0,
-        val durationMinutes: Int = 0,
-        val servings: Int = 0,
-        val tags: List<String> = listOf(),
-        val instructions: List<String> = listOf(),
-        val ingredients: List<IngredientListing> = listOf()
-    )
-
-    data class RecipePreviewUploadable(
-        val title: String = "",
-        val author: String = "",
-        val authorUserId: String = "",
-        val description: String = "",
-        val imgUrl: String = ""
-    )
-
-    private fun RecipeDraft.toRecipeUploadable(imgUrl: String, authorId: String, author: String): RecipeUploadable {
-        return RecipeUploadable(
-            title = title,
-            author = author,
-            authorUserId = authorId,
-            description = description,
-            imgUrl = imgUrl,
-            likeCount = 0,
-            durationMinutes = duration,
-            servings = servings,
-            instructions = preparationSteps,
-            ingredients = ingredientDrafts,
-            tags = tags
-        )
-    }
-
-    private fun RecipeDraft.toRecipePreviewUploadable(imgUrl: String, authorId: String, author: String): RecipePreviewUploadable {
-        return RecipePreviewUploadable(
-            title = title,
-            author = author,
-            authorUserId = authorId,
-            description = description,
-            imgUrl = imgUrl
-        )
-    }
-
 
     class RecipeDataSourceException(message: String? = null, cause: Throwable? = null, val code: ExceptionCode) : Exception(message, cause) {
         constructor(cause: Throwable, code: ExceptionCode) : this(null, cause, code)

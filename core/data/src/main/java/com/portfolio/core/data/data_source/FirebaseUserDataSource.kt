@@ -11,15 +11,15 @@ import com.portfolio.core.data.FirebaseConstants.USER_LIKED_RECIPES_DOCUMENT
 import com.portfolio.core.data.FirebaseConstants.USER_PRIVATE_DATA_BOOKMARKED_RECIPES_CONTENT_FIELD
 import com.portfolio.core.data.FirebaseConstants.USER_PRIVATE_DATA_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.USER_PRIVATE_DATA_LIKED_RECIPES_CONTENT_FIELD
-import com.portfolio.core.data.data_source.util.PublicUserDataSerializable
+import com.portfolio.core.data.data_source.model.PublicUserDataSerializable
+import com.portfolio.core.data.data_source.model.RecipePreviewSerializable
+import com.portfolio.core.data.data_source.model.RecipeSerializable
+import com.portfolio.core.data.data_source.model.toPublicUserData
+import com.portfolio.core.data.data_source.model.toRecipePreviewSerializable
 import com.portfolio.core.data.data_source.util.toPrivateUserData
-import com.portfolio.core.data.data_source.util.toPublicUserData
 import com.portfolio.core.data.util.firestoreSafeCallCache
 import com.portfolio.core.data.util.firestoreSafeCallServer
-import com.portfolio.core.domain.model.Recipe
-import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.model.UserData
-import com.portfolio.core.domain.model.toRecipePreview
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
 import com.portfolio.core.domain.util.Result
@@ -62,10 +62,10 @@ class FirebaseUserDataSource(
                 ))
             }
 
-            val recipe = snapshot.toObject(Recipe::class.java)!!
+            val recipe = snapshot.toObject(RecipeSerializable::class.java)!!
             recipe.recipeId = recipeId
 
-            return@firestoreSafeCallServer likeRecipe(userId = userId, recipe = recipe.toRecipePreview())
+            return@firestoreSafeCallServer likeRecipe(userId = userId, recipe = recipe.toRecipePreviewSerializable())
         }
     }
 
@@ -102,10 +102,10 @@ class FirebaseUserDataSource(
                 ))
             }
 
-            val recipe = snapshot.toObject(Recipe::class.java)!!
+            val recipe = snapshot.toObject(RecipeSerializable::class.java)!!
             recipe.recipeId = recipeId
 
-            return@firestoreSafeCallServer bookmarkRecipe(userId = userId, recipe = recipe.toRecipePreview())
+            return@firestoreSafeCallServer bookmarkRecipe(userId = userId, recipe = recipe.toRecipePreviewSerializable())
         }
     }
 
@@ -127,7 +127,7 @@ class FirebaseUserDataSource(
         }
     }
 
-    private suspend fun bookmarkRecipe(userId: String, recipe: RecipePreview): EmptyResult<DataError.Network> {
+    private suspend fun bookmarkRecipe(userId: String, recipe: RecipePreviewSerializable): EmptyResult<DataError.Network> {
         return firestoreSafeCallServer{
             val savedRecipesRef = firestore
                 .collection(USER_COLLECTION)
@@ -158,7 +158,7 @@ class FirebaseUserDataSource(
         }
     }
 
-    private suspend fun likeRecipe(userId: String, recipe: RecipePreview): EmptyResult<DataError.Network> {
+    private suspend fun likeRecipe(userId: String, recipe: RecipePreviewSerializable): EmptyResult<DataError.Network> {
         return firestoreSafeCallServer{
             val savedRecipesRef = firestore
                 .collection(USER_COLLECTION)

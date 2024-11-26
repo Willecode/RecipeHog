@@ -4,7 +4,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import com.portfolio.core.data.FirebaseConstants.RECIPE_PREVIEWS_COLLECTION
-import com.portfolio.core.data.util.RecipePreviewSerializable
+import com.portfolio.core.data.data_source.model.RecipePreviewSerializable
 import com.portfolio.core.data.util.firestoreSafeCallCache
 import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.data.util.toRecipePreview

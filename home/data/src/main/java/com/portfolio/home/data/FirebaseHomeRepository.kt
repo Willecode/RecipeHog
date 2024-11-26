@@ -5,11 +5,12 @@ import com.google.firebase.firestore.Source
 import com.portfolio.core.data.util.firestoreSafeCallCache
 import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.domain.model.HomeContent
-import com.portfolio.core.domain.model.HomeContent.MultiRecipePreview
-import com.portfolio.core.domain.model.HomeContent.SingleRecipePreview
-import com.portfolio.core.domain.model.RecipePreview
 import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.Result
+import com.portfolio.home.data.model.HomeContentSerializableMulti
+import com.portfolio.home.data.model.HomeContentSerializableSingle
+import com.portfolio.home.data.model.toMultiRecipePreview
+import com.portfolio.home.data.model.toSingleRecipePreview
 import com.portfolio.home.domain.HomeRepository
 import kotlinx.coroutines.tasks.await
 
@@ -51,47 +52,5 @@ class FirebaseHomeRepository(
         }
 
         return Result.Success(data)
-    }
-
-    data class HomeContentSerializableSingle(
-        val title: String = "",
-        val recipeTitle: String = "",
-        val author: String = "",
-        val description: String = "",
-        val imgUrl: String = "",
-        val recipeId: String = ""
-    )
-
-    private fun HomeContentSerializableSingle.toSingleRecipePreview(): SingleRecipePreview {
-        return SingleRecipePreview(
-            title = title,
-            recipe = RecipePreview(
-                title = recipeTitle,
-                author = author,
-                description = description,
-                imgUrl = imgUrl,
-                recipeId = recipeId
-            )
-        )
-    }
-
-    data class HomeContentSerializableMulti(
-        val title: String = "",
-        val content: List<Map<String, String>> = listOf()
-    )
-
-    private fun HomeContentSerializableMulti.toMultiRecipePreview(): MultiRecipePreview {
-        return MultiRecipePreview(
-            title = title,
-            recipes = content.map {
-                RecipePreview(
-                    title = it["title"] ?: "",
-                    author = it["author"] ?: "",
-                    description = it["description"] ?: "",
-                    imgUrl = it["imgUrl"] ?: "",
-                    recipeId = it["recipeId"] ?: ""
-                )
-            }
-        )
     }
 }

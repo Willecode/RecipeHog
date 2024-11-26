@@ -10,11 +10,11 @@ import com.portfolio.core.data.FirebaseConstants.USER_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.USER_LIKED_RECIPES_DOCUMENT
 import com.portfolio.core.data.FirebaseConstants.USER_PRIVATE_DATA_COLLECTION
 import com.portfolio.core.data.FirebaseConstants.USER_PROFILE_PIC_URL_FIELD
-import com.portfolio.core.data.data_source.util.PublicUserDataSerializable
+import com.portfolio.core.data.data_source.model.PublicUserDataSerializable
+import com.portfolio.core.data.data_source.model.RecipePreviewListSerializable
+import com.portfolio.core.data.data_source.model.toPublicUserData
 import com.portfolio.core.data.data_source.util.toPrivateUserData
-import com.portfolio.core.data.data_source.util.toPublicUserData
 import com.portfolio.core.data.util.FirebaseStorageUploader
-import com.portfolio.core.data.util.RecipePreviewSerializable
 import com.portfolio.core.data.util.firestoreSafeCallServer
 import com.portfolio.core.data.util.toRecipePreview
 import com.portfolio.core.domain.model.RecipePreview
@@ -253,9 +253,7 @@ class FirebaseReactiveUserDataSource(
         }
     }
 
-    data class RecipePreviewListSerializable(
-        val content: Map<String ,RecipePreviewSerializable> = mapOf()
-    )
+
 
     /**
      * Returns the path that the file will have in the remote database

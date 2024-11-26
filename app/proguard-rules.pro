@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep all recipehog Firebase models from being obfuscated, otherwise serialization fails
+-keep class com.portfolio.core.data.data_source.model.** {*;}
+-keep class com.portfolio.home.data.model.** {*;}
+-keep class com.portfolio.recipe.data.data_source.model.** {*;}
+-keep class com.portfolio.review.data.data_source.model.** {*;}

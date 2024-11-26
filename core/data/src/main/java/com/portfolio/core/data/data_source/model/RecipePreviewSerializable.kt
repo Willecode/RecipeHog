@@ -1,4 +1,4 @@
-package com.portfolio.core.data.util
+package com.portfolio.core.data.data_source.model
 
 data class RecipePreviewSerializable(
     val title: String = "",

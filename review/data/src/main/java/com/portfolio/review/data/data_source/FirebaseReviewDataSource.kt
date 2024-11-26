@@ -12,6 +12,10 @@ import com.portfolio.core.domain.util.DataError
 import com.portfolio.core.domain.util.EmptyResult
 import com.portfolio.core.domain.util.Result
 import com.portfolio.core.domain.util.asEmptyDataResult
+import com.portfolio.review.data.data_source.model.ReviewDocSerializable
+import com.portfolio.review.data.data_source.model.ReviewSerializable
+import com.portfolio.review.data.data_source.model.toReview
+import com.portfolio.review.data.data_source.model.toReviewSerializable
 import com.portfolio.review.domain.Review
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,16 +54,18 @@ class FirebaseReviewDataSource(
                 .collection(REVIEWS_COLLECTION)
                 .document(recipeId)
 
+            val reviewSerializable = review.toReviewSerializable()
+
             try {
                 docRef.update(
                     REVIEWS_CONTENT_FIELD,
-                    FieldValue.arrayUnion(review)
+                    FieldValue.arrayUnion(reviewSerializable)
                 ).await()
             } catch (e: FirebaseFirestoreException) {
                 when (e.code) {
                     FirebaseFirestoreException.Code.NOT_FOUND -> {
                         // Doc didn't exist, create it instead
-                        docRef.set(ReviewDocDtoUpload(content = listOf(review)))
+                        docRef.set(ReviewDocSerializable(content = listOf(reviewSerializable)))
                     }
                     else -> throw e
                 }
@@ -75,7 +81,7 @@ class FirebaseReviewDataSource(
             .get(source)
             .await()
 
-        val dto = docRef?.toObject(ReviewDocDtoDownload::class.java)
+        val dto = docRef?.toObject(ReviewDocSerializable::class.java)
             ?: throw FirebaseFirestoreException("Fetched review doc was null", FirebaseFirestoreException.Code.UNKNOWN)
 
         reviewFlow.update {
@@ -85,24 +91,8 @@ class FirebaseReviewDataSource(
         return Result.Success(Unit).asEmptyDataResult()
     }
 
-    data class ReviewDocDtoDownload(
-        val content: List<ReviewSerializable> = listOf()
-    )
 
-    data class ReviewDocDtoUpload(
-        val content: List<Review> = listOf()
-    )
 
-    data class ReviewSerializable(
-        val author: String = "",
-        val authorUserId: String = "",
-        val stars: Int = 0,
-        val body: String = ""
-    )
 
-    private fun ReviewSerializable.toReview(): Review {
-        return Review(
-            author = author, authorUserId = authorUserId, stars = stars, body = body
-        )
-    }
+
 }

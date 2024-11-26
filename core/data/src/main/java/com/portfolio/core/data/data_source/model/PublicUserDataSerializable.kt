@@ -1,6 +1,5 @@
-package com.portfolio.core.data.data_source.util
+package com.portfolio.core.data.data_source.model
 
-import com.portfolio.core.data.util.RecipePreviewSerializable
 import com.portfolio.core.data.util.toRecipePreview
 import com.portfolio.core.domain.model.PublicUserData
 import java.time.ZoneId
